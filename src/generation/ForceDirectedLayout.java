@@ -413,13 +413,13 @@ public class ForceDirectedLayout extends JPanel implements MouseListener, MouseM
 			s.append('H');
 		}
 		if ((forceMode & Graph.HOOKES_LOG_LAW) != 0) {
-			s.append('A');
+			s.append('L');
 		}
 		if ((forceMode & Graph.CHARGED_WALLS) != 0) {
 			s.append('W');
 		}
 		if ((forceMode & Graph.CHARGED_LABELS) != 0) {
-			s.append('L');
+			s.append('E');
 		}
 		if ((forceMode & Graph.DEGREE_BASED_CHARGE) != 0) {
 			s.append('D');
@@ -431,7 +431,7 @@ public class ForceDirectedLayout extends JPanel implements MouseListener, MouseM
 			 s.append('F');
 		 }
 		if ((forceMode & Graph.WRAP_AROUND_CHARGES) != 0) {
-			s.append('R');
+			s.append('A');
 		}
 		return s.toString();
 	}

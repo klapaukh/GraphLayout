@@ -20,4 +20,5 @@ random-dag/
 north
 rome
 random-dag
-
+.RData
+.Rhistory
