@@ -136,6 +136,10 @@ public class Node {
 		this.selected = !this.selected;
 	}
 
+	public void setSelected(boolean selected){
+		this.selected = selected;
+	}
+	
 	public void toggleMovement() {
 		mobile = !mobile;
 	}
@@ -148,8 +152,8 @@ public class Node {
 		return x >= this.x && x <= this.x + width && y >= this.y && y <= this.y + height;
 	}
 
-	public boolean inside(double[][] polygon) {
-		return Intersection.intersect(this.points, polygon);
+	public boolean inside(double[][] polygon, int size) {
+		return Intersection.intersect(this.points, this.points.length, polygon, size);
 	}
 
 	public boolean overlapps(Node o) {

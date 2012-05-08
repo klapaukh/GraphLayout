@@ -12,13 +12,13 @@ public class Intersection {
 	 *            Vertices of poly2
 	 * @return
 	 */
-	public static boolean intersect(double[][] poly1, double[][] poly2) {
+	public static boolean intersect(double[][] poly1, int length1, double[][] poly2, int length2) {
 		// find extrema for poly1 and 2
 		double maxx1 = Double.MIN_VALUE;
 		double minx1 = Double.MAX_VALUE;
 		double maxy1 = Double.MIN_VALUE;
 		double miny1 = Double.MAX_VALUE;
-		for (int i = 0; i < poly1.length; i++) {
+		for (int i = 0; i < length1; i++) {
 			maxx1 = Math.max(poly1[i][0], maxx1);
 			maxy1 = Math.max(poly1[i][1], maxy1);
 			minx1 = Math.min(poly1[i][0], minx1);
@@ -29,7 +29,7 @@ public class Intersection {
 		double minx2 = Double.MAX_VALUE;
 		double maxy2 = Double.MIN_VALUE;
 		double miny2 = Double.MAX_VALUE;
-		for (int i = 0; i < poly2.length; i++) {
+		for (int i = 0; i < length2; i++) {
 			maxx2 = Math.max(poly2[i][0], maxx2);
 			maxy2 = Math.max(poly2[i][1], maxy2);
 			minx2 = Math.min(poly2[i][0], minx2);
@@ -42,14 +42,14 @@ public class Intersection {
 		}
 
 		// Check all edge edge crossings
-		for (int i = 0; i < poly1.length; i++) {
-			for (int j = 0; j < poly2.length; j++) {
+		for (int i = 0; i < length1; i++) {
+			for (int j = 0; j < length2; j++) {
 				// Assign matrix values
-				double a = poly1[(i + 1) % poly1.length][0] - poly1[i][0];
-				double b = poly2[(j + 1) % poly2.length][0] - poly2[j][0];
+				double a = poly1[(i + 1) % length1][0] - poly1[i][0];
+				double b = poly2[(j + 1) % length2][0] - poly2[j][0];
 
-				double c = poly1[(i + 1) % poly1.length][1] - poly1[i][1];
-				double d = poly2[(j + 1) % poly2.length][1] - poly2[j][1];
+				double c = poly1[(i + 1) % length1][1] - poly1[i][1];
+				double d = poly2[(j + 1) % length2][1] - poly2[j][1];
 
 				double e = poly2[j][0] - poly1[i][0];
 				double f = poly2[j][1] - poly1[i][1];
@@ -90,17 +90,17 @@ public class Intersection {
 
 					if (b12 && b13 && b23) {
 						// Same line
-						minx1 = Math.min(poly1[(i + 1) % poly1.length][0], poly1[i][0]);
-						minx2 = Math.min(poly2[(j + 1) % poly2.length][0], poly2[j][0]);
+						minx1 = Math.min(poly1[(i + 1) % length1][0], poly1[i][0]);
+						minx2 = Math.min(poly2[(j + 1) % length2][0], poly2[j][0]);
 
-						maxx1 = Math.max(poly1[(i + 1) % poly1.length][0], poly1[i][0]);
-						maxx2 = Math.max(poly2[(j + 1) % poly2.length][0], poly2[j][0]);
+						maxx1 = Math.max(poly1[(i + 1) % length1][0], poly1[i][0]);
+						maxx2 = Math.max(poly2[(j + 1) % length2][0], poly2[j][0]);
 
-						miny1 = Math.min(poly1[(i + 1) % poly1.length][1], poly1[i][1]);
-						miny2 = Math.min(poly2[(j + 1) % poly2.length][1], poly2[j][1]);
+						miny1 = Math.min(poly1[(i + 1) % length1][1], poly1[i][1]);
+						miny2 = Math.min(poly2[(j + 1) % length2][1], poly2[j][1]);
 
-						maxy1 = Math.max(poly1[(i + 1) % poly1.length][1], poly1[i][1]);
-						maxy2 = Math.max(poly2[(j + 1) % poly2.length][1], poly2[j][1]);
+						maxy1 = Math.max(poly1[(i + 1) % length1][1], poly1[i][1]);
+						maxy2 = Math.max(poly2[(j + 1) % length2][1], poly2[j][1]);
 
 						if ((minx1 >= minx2 && minx1 <= maxx2) || (minx2 >= minx1 && minx2 <= maxx1) || (maxx1 >= minx2 && maxx1 <= maxx2)
 								|| (maxx2 >= minx1 && maxx2 <= maxx1)) {
@@ -117,11 +117,11 @@ public class Intersection {
 			double a = 1;
 			double c = 0;
 			int count = 0;
-			for (int j = 0; j < poly2.length; j++) {
+			for (int j = 0; j < length2; j++) {
 				// Assign matrix values
-				double b = poly2[(j + 1) % poly2.length][0] - poly2[j][0];
+				double b = poly2[(j + 1) % length2][0] - poly2[j][0];
 
-				double d = poly2[(j + 1) % poly2.length][1] - poly2[j][1];
+				double d = poly2[(j + 1) % length2][1] - poly2[j][1];
 
 				double e = poly2[j][0] - poly1[i][0];
 				double f = poly2[j][1] - poly1[i][1];
@@ -160,11 +160,11 @@ public class Intersection {
 			double b = 1;
 			double d = 0;
 			int j = 0;
-			for (int i = 0; i < poly1.length; i++) {
+			for (int i = 0; i < length1; i++) {
 				// Assign matrix values
-				double a = poly1[(i + 1) % poly1.length][0] - poly1[i][0];
+				double a = poly1[(i + 1) % length1][0] - poly1[i][0];
 
-				double c = poly1[(i + 1) % poly1.length][1] - poly1[i][1];
+				double c = poly1[(i + 1) % length1][1] - poly1[i][1];
 
 				double e = poly2[j][0] - poly1[i][0];
 				double f = poly2[j][1] - poly1[i][1];

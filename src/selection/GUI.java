@@ -1,8 +1,11 @@
 package selection;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -25,19 +28,20 @@ public class GUI extends JComponent implements MouseInputListener {
 	private static final int INITIAL_CAPACITY = 100;
 	private JFrame frame;
 	private List<Node> nodes;
-	private List<double[]> points;
-	private boolean selecting;
+	private double[][] points;
+	private boolean selecting, deselecting;
 	private Node selected;
 	public List<Integer> start, end;
 	public List<String> label;
 	private SpriteLibrary sprites;
-	private int[] pointsDrawX,pointsDrawY;
+	private int[] pointsDrawX, pointsDrawY;
 	private int size;
-	
+	private List<Node> selectedThisRound;
 
 	public GUI() throws IOException {
 		nodes = new ArrayList<Node>();
-		points = new ArrayList<double[]>();
+		selectedThisRound = new ArrayList<Node>();
+		points = new double[INITIAL_CAPACITY][2];
 		pointsDrawY = new int[INITIAL_CAPACITY];
 		pointsDrawX = new int[INITIAL_CAPACITY];
 		start = new ArrayList<Integer>();
@@ -47,9 +51,12 @@ public class GUI extends JComponent implements MouseInputListener {
 		size = 0;
 
 		selecting = false;
+		deselecting = false;
 		selected = null;
 		frame = new JFrame("Graph Renderer");
-		frame.setSize(800, 800);
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		frame.setSize(screenSize);
+		frame.setUndecorated(true);
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -68,7 +75,6 @@ public class GUI extends JComponent implements MouseInputListener {
 		start.clear();
 		end.clear();
 		label.clear();
-		points.clear();
 		size = 0;
 		selected = null;
 		selecting = false;
@@ -86,7 +92,8 @@ public class GUI extends JComponent implements MouseInputListener {
 					int y = Integer.parseInt(props[3]);
 					int width = Integer.parseInt(props[4]);
 					int height = Integer.parseInt(props[5]);
-					nodes.add(new Node(x, y, width, height, label, type, sprites,1,1));
+					nodes.add(new Node(x, y, width, height, label, type,
+							sprites, 1, 1));
 
 					for (int i = 6; i < props.length; i += 2) {
 						int end = Integer.parseInt(props[i]);
@@ -105,8 +112,10 @@ public class GUI extends JComponent implements MouseInputListener {
 			System.out.println("Generating Random Graph");
 			int numNodes = (int) (Math.random() * 30 + 10);
 			for (int i = 0; i < numNodes; i++) {
-				nodes.add(new Node((int) (Math.random() * 800), (int) (Math.random() * 800), (int) (Math.random() * 40 + 10),
-						(int) (Math.random() * 40 + 10), randString(5), randType(), sprites,1,1));
+				nodes.add(new Node((int) (Math.random() * 800), (int) (Math
+						.random() * 800), (int) (Math.random() * 40 + 10),
+						(int) (Math.random() * 40 + 10), randString(5),
+						randType(), sprites, 1, 1));
 			}
 
 			int numEdges = (int) (Math.random() * numNodes / 2 + numNodes / 2);
@@ -142,7 +151,6 @@ public class GUI extends JComponent implements MouseInputListener {
 		return s.toString();
 	}
 
-	Node temp = null;
 	public void paint(Graphics g) {
 		g.setColor(Color.white);
 		g.fillRect(0, 0, getWidth(), getHeight());
@@ -151,45 +159,48 @@ public class GUI extends JComponent implements MouseInputListener {
 			Node s = nodes.get(start.get(i));
 			Node e = nodes.get(end.get(i));
 			String l = label.get(i);
-			s.drawArc((Graphics2D) g, e, l, temp);
+			s.drawArc((Graphics2D) g, e, l, null);
 		}
 
 		for (Node n : nodes) {
 			n.draw(g);
 		}
-		if (selecting) {
-				g.setColor(new Color(255,0,255,50));
-				g.fillPolygon(pointsDrawX,pointsDrawY, points.size());
+		if (selecting || deselecting) {
+			if (selecting) {
+				g.setColor(new Color(255, 0, 255, 50));
+			} else {
+				g.setColor(new Color(255, 255, 0, 50));
+			}
+			g.fillPolygon(pointsDrawX, pointsDrawY, size);
+			if (selecting) {
 				g.setColor(Color.red);
-				g.drawPolygon(pointsDrawX,pointsDrawY, points.size());
+			} else {
+				g.setColor(Color.blue);
+			}
+			g.drawPolygon(pointsDrawX, pointsDrawY, size);
 		}
 	}
-	
+
 	@Override
 	public void mouseClicked(MouseEvent e) {
 	}
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		boolean on = false;
-		for (Node n : nodes) {
-			if (n.in(e.getX(), e.getY())) {
-				on = true;
-				selected = n;
-				break;
-			}
 
-		}
-		if (!on) {
+		if (e.getButton() == MouseEvent.BUTTON1) {
 			selecting = true;
-			points.add(new double[] { e.getX(), e.getY() });
-			ensureCapacity();
-			pointsDrawX[size] = e.getX();
-			pointsDrawY[size] = e.getY();
-			size++;
+		} else if (e.getButton() == MouseEvent.BUTTON3) {
+			deselecting = true;
 		} else {
-
+			return;
 		}
+		ensureCapacity();
+		points[size][0] = e.getX();
+		points[size][1] = e.getY();
+		pointsDrawX[size] = e.getX();
+		pointsDrawY[size] = e.getY();
+		size++;
 
 		this.repaint();
 
@@ -197,17 +208,17 @@ public class GUI extends JComponent implements MouseInputListener {
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		if (selecting) {
+		if (selecting || deselecting) {
 			for (Node n : nodes) {
-				if(n.inside(points.toArray(new double[points.size()][2]))){
-					n.toggleSelected();
+				if (n.inside(points,size)) {
+					n.setSelected(selecting);
 				}
 			}
 
-			points.clear();
 			size = 0;
 		}
 		selecting = false;
+		deselecting = false;
 		selected = null;
 		repaint();
 	}
@@ -224,11 +235,12 @@ public class GUI extends JComponent implements MouseInputListener {
 
 	@Override
 	public void mouseDragged(MouseEvent e) {
-		if (selecting) {
-			points.add(new double[] { e.getX(), e.getY() });
+		if (selecting || deselecting) {
 			ensureCapacity();
-			pointsDrawX[size]=e.getX();
-			pointsDrawY[size]=e.getY();
+			points[size][0] = e.getX();
+			points[size][1] = e.getY();
+			pointsDrawX[size] = e.getX();
+			pointsDrawY[size] = e.getY();
 			size++;
 		} else if (selected != null) {
 			selected.setPosition(e.getX(), e.getY());
@@ -240,19 +252,24 @@ public class GUI extends JComponent implements MouseInputListener {
 	public void mouseMoved(MouseEvent e) {
 
 	}
-	
-	public void ensureCapacity(){
-		if(size >= pointsDrawX.length){
+
+	public void ensureCapacity() {
+		if (size >= pointsDrawX.length) {
 			int[] tx = pointsDrawX;
 			int[] ty = pointsDrawY;
-			pointsDrawX = new int[pointsDrawX.length*2];
-			pointsDrawY = new int[pointsDrawY.length*2];
-			for(int i = 0 ; i < size;i++){
+			double[][] tp = points;
+			pointsDrawX = new int[pointsDrawX.length * 2];
+			pointsDrawY = new int[pointsDrawY.length * 2];
+			points = new double[points.length*2][2];
+			for (int i = 0; i < size; i++) {
 				pointsDrawX[i] = tx[i];
 				pointsDrawY[i] = ty[i];
+				points[i][0] = tp[i][0];
+				points[i][1] = tp[i][1];
 			}
 		}
 	}
+
 	public static void main(String args[]) throws IOException {
 		new GUI();
 
