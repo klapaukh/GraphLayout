@@ -140,6 +140,10 @@ public class Node {
 		this.selected = selected;
 	}
 	
+	public boolean selected(){
+		return selected;
+	}
+	
 	public void toggleMovement() {
 		mobile = !mobile;
 	}

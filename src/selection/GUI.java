@@ -92,8 +92,7 @@ public class GUI extends JComponent implements MouseInputListener {
 					int y = Integer.parseInt(props[3]);
 					int width = Integer.parseInt(props[4]);
 					int height = Integer.parseInt(props[5]);
-					nodes.add(new Node(x, y, width, height, label, type,
-							sprites, 1, 1));
+					nodes.add(new Node(x, y, width, height, label, type, sprites, 1, 1));
 
 					for (int i = 6; i < props.length; i += 2) {
 						int end = Integer.parseInt(props[i]);
@@ -112,10 +111,8 @@ public class GUI extends JComponent implements MouseInputListener {
 			System.out.println("Generating Random Graph");
 			int numNodes = (int) (Math.random() * 30 + 10);
 			for (int i = 0; i < numNodes; i++) {
-				nodes.add(new Node((int) (Math.random() * 800), (int) (Math
-						.random() * 800), (int) (Math.random() * 40 + 10),
-						(int) (Math.random() * 40 + 10), randString(5),
-						randType(), sprites, 1, 1));
+				nodes.add(new Node((int) (Math.random() * 800), (int) (Math.random() * 800), (int) (Math.random() * 40 + 10),
+						(int) (Math.random() * 40 + 10), randString(5), randType(), sprites, 1, 1));
 			}
 
 			int numEdges = (int) (Math.random() * numNodes / 2 + numNodes / 2);
@@ -187,8 +184,7 @@ public class GUI extends JComponent implements MouseInputListener {
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		
-		
+
 		if (e.getButton() == MouseEvent.BUTTON1) {
 			selecting = true;
 		} else if (e.getButton() == MouseEvent.BUTTON3) {
@@ -211,8 +207,14 @@ public class GUI extends JComponent implements MouseInputListener {
 	public void mouseReleased(MouseEvent e) {
 		if (selecting || deselecting) {
 			for (Node n : nodes) {
-				if (!selectedThisRound.contains(n) && n.inside(points,size)) {
-					n.setSelected(selecting);
+				boolean thisRound = selectedThisRound.contains(n);
+				if (!thisRound && deselecting == n.selected() && n.inside(points, size)) {
+					if (!selectedThisRound.contains(n)) {
+						n.setSelected(selecting);
+					}
+				} else if (thisRound && !n.inside(points, size)) {
+					n.setSelected(deselecting);
+					selectedThisRound.remove(n);
 				}
 			}
 
@@ -244,11 +246,17 @@ public class GUI extends JComponent implements MouseInputListener {
 			pointsDrawX[size] = e.getX();
 			pointsDrawY[size] = e.getY();
 			size++;
-			
+
 			for (Node n : nodes) {
-				if (!selectedThisRound.contains(n) && n.inside(points,size)) {
-					n.setSelected(selecting);
-					selectedThisRound.add(n);
+				boolean thisRound = selectedThisRound.contains(n);
+				if (!thisRound && deselecting == n.selected() && n.inside(points, size)) {
+					if (!selectedThisRound.contains(n)) {
+						n.setSelected(selecting);
+						selectedThisRound.add(n);
+					}
+				} else if (thisRound && !n.inside(points, size)) {
+					n.setSelected(deselecting);
+					selectedThisRound.remove(n);
 				}
 			}
 		} else if (selected != null) {
@@ -269,7 +277,7 @@ public class GUI extends JComponent implements MouseInputListener {
 			double[][] tp = points;
 			pointsDrawX = new int[pointsDrawX.length * 2];
 			pointsDrawY = new int[pointsDrawY.length * 2];
-			points = new double[points.length*2][2];
+			points = new double[points.length * 2][2];
 			for (int i = 0; i < size; i++) {
 				pointsDrawX[i] = tx[i];
 				pointsDrawY[i] = ty[i];
