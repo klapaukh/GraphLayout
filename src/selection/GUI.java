@@ -22,22 +22,29 @@ import representation.SpriteLibrary;
 public class GUI extends JComponent implements MouseInputListener {
 
 	private static final long serialVersionUID = 2173693118914351514L;
+	private static final int INITIAL_CAPACITY = 100;
 	private JFrame frame;
 	private List<Node> nodes;
-	private List<int[]> points;
+	private List<double[]> points;
 	private boolean selecting;
 	private Node selected;
 	public List<Integer> start, end;
 	public List<String> label;
 	private SpriteLibrary sprites;
+	private int[] pointsDrawX,pointsDrawY;
+	private int size;
+	
 
 	public GUI() throws IOException {
 		nodes = new ArrayList<Node>();
-		points = new ArrayList<int[]>();
+		points = new ArrayList<double[]>();
+		pointsDrawY = new int[INITIAL_CAPACITY];
+		pointsDrawX = new int[INITIAL_CAPACITY];
 		start = new ArrayList<Integer>();
 		end = new ArrayList<Integer>();
 		label = new ArrayList<String>();
-		sprites = new SpriteLibrary();
+		this.sprites = new SpriteLibrary();
+		size = 0;
 
 		selecting = false;
 		selected = null;
@@ -62,6 +69,7 @@ public class GUI extends JComponent implements MouseInputListener {
 		end.clear();
 		label.clear();
 		points.clear();
+		size = 0;
 		selected = null;
 		selecting = false;
 
@@ -134,7 +142,7 @@ public class GUI extends JComponent implements MouseInputListener {
 		return s.toString();
 	}
 
-	Node temp = new Node(1, 1, "", "Rock", sprites, 1, 1);
+	Node temp = null;
 	public void paint(Graphics g) {
 		g.setColor(Color.white);
 		g.fillRect(0, 0, getWidth(), getHeight());
@@ -150,13 +158,13 @@ public class GUI extends JComponent implements MouseInputListener {
 			n.draw(g);
 		}
 		if (selecting) {
-			g.setColor(Color.red);
-			for (int i = 0; i < points.size(); i++) {
-				g.drawLine((int)points.get(i)[0], (int)points.get(i)[1],(int) points.get((i + 1) % points.size())[0], (int)points.get((i + 1) % points.size())[1]);
-			}
+				g.setColor(new Color(255,0,255,50));
+				g.fillPolygon(pointsDrawX,pointsDrawY, points.size());
+				g.setColor(Color.red);
+				g.drawPolygon(pointsDrawX,pointsDrawY, points.size());
 		}
 	}
-
+	
 	@Override
 	public void mouseClicked(MouseEvent e) {
 	}
@@ -174,7 +182,11 @@ public class GUI extends JComponent implements MouseInputListener {
 		}
 		if (!on) {
 			selecting = true;
-			points.add(new int[] { e.getX(), e.getY() });
+			points.add(new double[] { e.getX(), e.getY() });
+			ensureCapacity();
+			pointsDrawX[size] = e.getX();
+			pointsDrawY[size] = e.getY();
+			size++;
 		} else {
 
 		}
@@ -193,6 +205,7 @@ public class GUI extends JComponent implements MouseInputListener {
 			}
 
 			points.clear();
+			size = 0;
 		}
 		selecting = false;
 		selected = null;
@@ -212,7 +225,11 @@ public class GUI extends JComponent implements MouseInputListener {
 	@Override
 	public void mouseDragged(MouseEvent e) {
 		if (selecting) {
-			points.add(new int[] { e.getX(), e.getY() });
+			points.add(new double[] { e.getX(), e.getY() });
+			ensureCapacity();
+			pointsDrawX[size]=e.getX();
+			pointsDrawY[size]=e.getY();
+			size++;
 		} else if (selected != null) {
 			selected.setPosition(e.getX(), e.getY());
 		}
@@ -223,7 +240,19 @@ public class GUI extends JComponent implements MouseInputListener {
 	public void mouseMoved(MouseEvent e) {
 
 	}
-
+	
+	public void ensureCapacity(){
+		if(size >= pointsDrawX.length){
+			int[] tx = pointsDrawX;
+			int[] ty = pointsDrawY;
+			pointsDrawX = new int[pointsDrawX.length*2];
+			pointsDrawY = new int[pointsDrawY.length*2];
+			for(int i = 0 ; i < size;i++){
+				pointsDrawX[i] = tx[i];
+				pointsDrawY[i] = ty[i];
+			}
+		}
+	}
 	public static void main(String args[]) throws IOException {
 		new GUI();
 

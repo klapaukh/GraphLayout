@@ -2,6 +2,16 @@ package representation;
 
 public class Intersection {
 
+	/**
+	 * Checks if two polygons specified by these bounding points are overlapping (includes containment) Each double array is an array of points where
+	 * the first array index specifies which vertex it is, and the second array index is 0 for x ,and 1 for y
+	 * 
+	 * @param poly1
+	 *            Vertices of poly1
+	 * @param poly2
+	 *            Vertices of poly2
+	 * @return
+	 */
 	public static boolean intersect(double[][] poly1, double[][] poly2) {
 		// find extrema for poly1 and 2
 		double maxx1 = Double.MIN_VALUE;
@@ -208,8 +218,8 @@ public class Intersection {
 	 * @param timestep
 	 * @return when a collision occurs before timestep or timestep
 	 */
-	public static double intersectWhileMoving(double p1x, double p1y, double p2x, double p2y, double p3x, double p3y, double u1x, double u1y, double u2x,
-			double u2y, double timestep) {
+	public static double intersectWhileMoving(double p1x, double p1y, double p2x, double p2y, double p3x, double p3y, double u1x, double u1y,
+			double u2x, double u2y, double timestep) {
 
 		double a = p3x - p1x + u1x - u2x;
 		double b = p2x - p1x;
@@ -266,37 +276,37 @@ public class Intersection {
 					if (Double.compare(a, 0) != 0 && Double.compare(e / a, 0) >= 0 && Double.compare(e / a, 1) <= 0) {
 						return (e / a) * timestep;
 					}
-				} else{
-					double ta0 = e/a;
-					double ta1 = (e-b)/a;
-					if(Double.compare(ta0, 0) <0 && Double.compare(ta1, 0) <0 ){
-						//No intersection because t always <0
-					}else if(Double.compare(ta0, 1) > 0 && Double.compare(ta1,1) >0){
-						//No intersection because t always >1
-					}else if(Double.compare(ta0,0)<=0 && Double.compare(ta1,0)>=0){
-						//t == 0 is in the range
+				} else {
+					double ta0 = e / a;
+					double ta1 = (e - b) / a;
+					if (Double.compare(ta0, 0) < 0 && Double.compare(ta1, 0) < 0) {
+						// No intersection because t always <0
+					} else if (Double.compare(ta0, 1) > 0 && Double.compare(ta1, 1) > 0) {
+						// No intersection because t always >1
+					} else if (Double.compare(ta0, 0) <= 0 && Double.compare(ta1, 0) >= 0) {
+						// t == 0 is in the range
 						return 0;
-					}else if(Double.compare(ta0, 0)>=0 && Double.compare(ta1, 0)<=0){
-						//t = 0 is in the range
+					} else if (Double.compare(ta0, 0) >= 0 && Double.compare(ta1, 0) <= 0) {
+						// t = 0 is in the range
 						return 0;
-					}else if(Double.compare(ta0,0) > 0 && Double.compare(ta0,1) <= 0 && Double.compare(ta1,ta0) >= 0 ){
-						//ta0 is legal and ta0 <= t1
-						return ta0*timestep;
-					}else if(Double.compare(ta1,0) > 0 && Double.compare(ta1,1) <=0 &&  Double.compare(ta1,ta0)<=0){
-						return ta1*timestep;
-					}else{
+					} else if (Double.compare(ta0, 0) > 0 && Double.compare(ta0, 1) <= 0 && Double.compare(ta1, ta0) >= 0) {
+						// ta0 is legal and ta0 <= t1
+						return ta0 * timestep;
+					} else if (Double.compare(ta1, 0) > 0 && Double.compare(ta1, 1) <= 0 && Double.compare(ta1, ta0) <= 0) {
+						return ta1 * timestep;
+					} else {
 						System.out.println("Unimplemented");
-						return 0.1*timestep;
+						return 0.1 * timestep;
 					}
 				}
 			}
 		}
-		return timestep*2;
+		return timestep * 2;
 	}
 
 	public static void main(String args[]) {
-		double time = Intersection.intersectWhileMoving(0, 0, 1, 1, 1, 1, 0, 2, 2, 0, 1);//0.5
-		double time1 = Intersection.intersectWhileMoving(0, 0, 1, 1, 2, 2, 3, 3, 3, 3, 1);//1.0
+		double time = Intersection.intersectWhileMoving(0, 0, 1, 1, 1, 1, 0, 2, 2, 0, 1);// 0.5
+		double time1 = Intersection.intersectWhileMoving(0, 0, 1, 1, 2, 2, 3, 3, 3, 3, 1);// 1.0
 		System.out.println(time + " " + time1);
 
 	}

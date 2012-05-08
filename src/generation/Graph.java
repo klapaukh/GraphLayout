@@ -22,8 +22,8 @@ import javax.xml.parsers.SAXParserFactory;
 import representation.Arc;
 import representation.Node;
 import representation.SpriteLibrary;
-import selection.Vector;
-import selection.VectorFactory;
+import representation.Vector;
+import representation.VectorFactory;
 
 public class Graph {
 

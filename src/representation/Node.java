@@ -7,9 +7,6 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.geom.Rectangle2D;
 
-import selection.Vector;
-import selection.VectorFactory;
-
 public class Node {
 
 	private double[][] points;
@@ -251,13 +248,13 @@ public class Node {
 	public void updateVelocity(double dampening, double timestep) {
 		// f = ma => a = f / m
 
-//		System.out.print(dx + "," + dy+   " -> ");
+		// System.out.print(dx + "," + dy+ " -> ");
 		dy *= dampening * timestep;
 		dx *= dampening * timestep;
 
 		dx += forcex / mass;
 		dy += forcey / mass;
-//		System.out.println(dx + "," + dy);
+		// System.out.println(dx + "," + dy);
 
 		double jumpAway = 5 * Math.max(this.width, this.height);
 		if (Double.isNaN(dx) || Double.isInfinite(dx)) {
@@ -284,7 +281,7 @@ public class Node {
 			return timeStep;
 
 		this.nextx = (x + dx * timeStep);
-		this.nexty =  (y + dy * timeStep);
+		this.nexty = (y + dy * timeStep);
 
 		nextPoints[0][0] = nextx;
 		nextPoints[0][1] = nexty;
@@ -447,17 +444,16 @@ public class Node {
 		g.drawRect(boxx, boxy, boxWidth, boxHeight);
 
 		g.drawString(label, (int) x + (width / 2) - (textWidth / 2), (int) y + height - m.getMaxDescent());
-		
-		double vecSize = Math.sqrt(forcex*forcex+forcey*forcey);
-		int vecx = (int) ((int) (150*forcex/vecSize) + x + width/2);
-		int  vecy = (int) ((int) (150*forcey/vecSize) + y + height /2);
-		
-		g.drawLine((int)(x+width/2), (int)(y+height/2), vecx, vecy);
-		
 
-//		g.fillRect(x, y, width, height);
-//		g.setColor(Color.pink);
-//		g.drawRect(x, y, width, height);
+		double vecSize = Math.sqrt(forcex * forcex + forcey * forcey);
+		int vecx = (int) ((int) (150 * forcex / vecSize) + x + width / 2);
+		int vecy = (int) ((int) (150 * forcey / vecSize) + y + height / 2);
+
+		g.drawLine((int) (x + width / 2), (int) (y + height / 2), vecx, vecy);
+
+		// g.fillRect(x, y, width, height);
+		// g.setColor(Color.pink);
+		// g.drawRect(x, y, width, height);
 	}
 
 	public void updateArc(FontMetrics m, Node target, String name, Node l) {
@@ -557,10 +553,12 @@ public class Node {
 					// if (o != null) {
 					// o.drawRect(lx1, ly1, labelWidth, labelHeight);
 					// }
-					label.x = lx1;
-					label.y = ly1;
-					label.width = labelWidth;
-					label.height = labelHeight;
+					if (label != null) {
+						label.x = lx1;
+						label.y = ly1;
+						label.width = labelWidth;
+						label.height = labelHeight;
+					}
 				}
 			}
 				break;
@@ -581,10 +579,12 @@ public class Node {
 					// if (o != null) {
 					// o.drawRect(lx1, ly1, labelWidth, labelHeight);
 					// }
-					label.x = lx1;
-					label.y = ly1;
-					label.width = labelWidth;
-					label.height = labelHeight;
+					if (label != null) {
+						label.x = lx1;
+						label.y = ly1;
+						label.width = labelWidth;
+						label.height = labelHeight;
+					}
 				}
 			}
 				break;
@@ -602,10 +602,12 @@ public class Node {
 					if (o != null) {
 						o.drawString(name, lx1, my);
 					}
-					label.x = lx1;
-					label.y = ly1;
-					label.width = labelWidth;
-					label.height = labelHeight;
+					if (label != null) {
+						label.x = lx1;
+						label.y = ly1;
+						label.width = labelWidth;
+						label.height = labelHeight;
+					}
 				}
 			}
 				break;
@@ -622,10 +624,12 @@ public class Node {
 					if (o != null) {
 						o.drawString(name, lx1, my);
 					}
-					label.x = lx1;
-					label.y = ly1;
-					label.width = labelWidth;
-					label.height = labelHeight;
+					if (label != null) {
+						label.x = lx1;
+						label.y = ly1;
+						label.width = labelWidth;
+						label.height = labelHeight;
+					}
 				}
 			}
 				break;
