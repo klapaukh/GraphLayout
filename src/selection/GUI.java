@@ -187,7 +187,8 @@ public class GUI extends JComponent implements MouseInputListener {
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-
+		
+		
 		if (e.getButton() == MouseEvent.BUTTON1) {
 			selecting = true;
 		} else if (e.getButton() == MouseEvent.BUTTON3) {
@@ -210,7 +211,7 @@ public class GUI extends JComponent implements MouseInputListener {
 	public void mouseReleased(MouseEvent e) {
 		if (selecting || deselecting) {
 			for (Node n : nodes) {
-				if (n.inside(points,size)) {
+				if (!selectedThisRound.contains(n) && n.inside(points,size)) {
 					n.setSelected(selecting);
 				}
 			}
@@ -220,6 +221,7 @@ public class GUI extends JComponent implements MouseInputListener {
 		selecting = false;
 		deselecting = false;
 		selected = null;
+		selectedThisRound.clear();
 		repaint();
 	}
 
@@ -242,6 +244,13 @@ public class GUI extends JComponent implements MouseInputListener {
 			pointsDrawX[size] = e.getX();
 			pointsDrawY[size] = e.getY();
 			size++;
+			
+			for (Node n : nodes) {
+				if (!selectedThisRound.contains(n) && n.inside(points,size)) {
+					n.setSelected(selecting);
+					selectedThisRound.add(n);
+				}
+			}
 		} else if (selected != null) {
 			selected.setPosition(e.getX(), e.getY());
 		}
