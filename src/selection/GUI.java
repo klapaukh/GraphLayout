@@ -162,7 +162,7 @@ public class GUI extends JComponent implements MouseInputListener {
 		for (Node n : nodes) {
 			n.draw(g);
 		}
-		if (selecting || deselecting) {
+		if ((selecting || deselecting) && size >= 3) {
 			if (selecting) {
 				g.setColor(new Color(255, 0, 255, 50));
 			} else {
@@ -184,7 +184,28 @@ public class GUI extends JComponent implements MouseInputListener {
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-
+		if (selecting || deselecting) {
+			if (e.getButton() == MouseEvent.BUTTON2) {
+				selectedThisRound.get(selectedThisRound.size()-1).toggleSelected();
+			} else {
+				if (size > 0)
+					size--;
+				for (Node n : nodes) {
+					boolean thisRound = selectedThisRound.contains(n);
+					if (!thisRound && deselecting == n.selected() && n.inside(points, size)) {
+						if (!selectedThisRound.contains(n)) {
+							n.setSelected(selecting);
+							selectedThisRound.add(n);
+						}
+					} else if (thisRound && !n.inside(points, size)) {
+						n.setSelected(deselecting);
+						selectedThisRound.remove(n);
+					}
+				}
+			}
+			this.repaint();
+			return;
+		}
 		if (e.getButton() == MouseEvent.BUTTON1) {
 			selecting = true;
 		} else if (e.getButton() == MouseEvent.BUTTON3) {
@@ -205,7 +226,7 @@ public class GUI extends JComponent implements MouseInputListener {
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		if (selecting || deselecting) {
+		if ((selecting && e.getButton() == MouseEvent.BUTTON1) || (deselecting && e.getButton() == MouseEvent.BUTTON3)) {
 			for (Node n : nodes) {
 				boolean thisRound = selectedThisRound.contains(n);
 				if (!thisRound && deselecting == n.selected() && n.inside(points, size)) {
@@ -219,12 +240,12 @@ public class GUI extends JComponent implements MouseInputListener {
 			}
 
 			size = 0;
+			selecting = false;
+			deselecting = false;
+			selected = null;
+			selectedThisRound.clear();
+			repaint();
 		}
-		selecting = false;
-		deselecting = false;
-		selected = null;
-		selectedThisRound.clear();
-		repaint();
 	}
 
 	@Override
