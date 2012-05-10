@@ -209,6 +209,7 @@ public class GUI extends JComponent implements MouseInputListener {
 		if (e.getButton() == MouseEvent.BUTTON1) {
 			selecting = true;
 		} else if (e.getButton() == MouseEvent.BUTTON3) {
+			
 			deselecting = true;
 		} else {
 			return;
