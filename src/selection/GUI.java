@@ -19,10 +19,13 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.event.MouseInputListener;
 
+import nz.ac.vuw.ecs.moveme.PSMoveClient;
+import nz.ac.vuw.ecs.moveme.UpdateListener;
+
 import representation.Node;
 import representation.SpriteLibrary;
 
-public class GUI extends JComponent implements MouseInputListener {
+public class GUI extends JComponent implements MouseInputListener, UpdateListener {
 
 	private static final long serialVersionUID = 2173693118914351514L;
 	private static final int INITIAL_CAPACITY = 100;
@@ -37,8 +40,12 @@ public class GUI extends JComponent implements MouseInputListener {
 	private int[] pointsDrawX, pointsDrawY;
 	private int size;
 	private List<Node> selectedThisRound;
+	private PSMoveClient moveClient;
+	private int mouseX, mouseY;
 
 	public GUI() throws IOException {
+		moveClient = new PSMoveClient();
+		moveClient.registerListener(this);
 		nodes = new ArrayList<Node>();
 		selectedThisRound = new ArrayList<Node>();
 		points = new double[INITIAL_CAPACITY][2];
@@ -49,6 +56,7 @@ public class GUI extends JComponent implements MouseInputListener {
 		label = new ArrayList<String>();
 		this.sprites = new SpriteLibrary();
 		size = 0;
+		mouseX = mouseY = -100;
 
 		selecting = false;
 		deselecting = false;
@@ -66,6 +74,14 @@ public class GUI extends JComponent implements MouseInputListener {
 		loadGraph("examplef.txt");
 
 		frame.setVisible(true);
+
+		try {
+			moveClient.connect("130.195.11.193", 7899);
+			moveClient.delayChange(2);
+		} catch (IOException e) {
+			// Don't fail if move doesn't connect
+			e.printStackTrace();
+		}
 		repaint();
 	}
 
@@ -176,6 +192,9 @@ public class GUI extends JComponent implements MouseInputListener {
 			}
 			g.drawPolygon(pointsDrawX, pointsDrawY, size);
 		}
+
+		g.setColor(Color.GREEN);
+		g.fillOval(mouseX - 10, mouseY - 10, 20, 20);
 	}
 
 	@Override
@@ -186,7 +205,7 @@ public class GUI extends JComponent implements MouseInputListener {
 	public void mousePressed(MouseEvent e) {
 		if (selecting || deselecting) {
 			if (e.getButton() == MouseEvent.BUTTON2) {
-				selectedThisRound.get(selectedThisRound.size()-1).toggleSelected();
+				selectedThisRound.get(selectedThisRound.size() - 1).toggleSelected();
 			} else {
 				if (size > 0)
 					size--;
@@ -209,7 +228,7 @@ public class GUI extends JComponent implements MouseInputListener {
 		if (e.getButton() == MouseEvent.BUTTON1) {
 			selecting = true;
 		} else if (e.getButton() == MouseEvent.BUTTON3) {
-			
+
 			deselecting = true;
 		} else {
 			return;
@@ -314,4 +333,172 @@ public class GUI extends JComponent implements MouseInputListener {
 
 	}
 
+	@Override
+	public void positionUpdate(int buttonsPushed, int buttonsHeld, int buttonsReleased, int trigger) {
+		try {
+			if ((buttonsPushed & UpdateListener.ButtonCircle) != 0) {
+				moveClient.setLaserRight(0);
+			}
+			if ((buttonsPushed & UpdateListener.ButtonCross) != 0) {
+				moveClient.setLaserBottom(0);
+			}
+			if ((buttonsPushed & UpdateListener.ButtonTriangle) != 0) {
+				moveClient.setLaserTop(0);
+			}
+			if ((buttonsPushed & UpdateListener.ButtonSquare) != 0) {
+				moveClient.setLaserLeft(0);
+			}
+			if ((buttonsPushed & UpdateListener.ButtonMove) != 0) {
+				moveClient.enableLaser(0);
+			}
+			if ((buttonsPushed & UpdateListener.ButtonSelect) != 0) {
+				moveClient.resetController(0);
+			}
+			if ((buttonsPushed & UpdateListener.ButtonStart) != 0) {
+				moveClient.calibrateController(0);
+			}
+			if (trigger > 100) {
+				moveClient.setTrackingColor(PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	int triggerLast = 0;
+
+	@Override
+	public void positionUpdate(float x, float y, int buttonsPushed, int buttonsHeld, int buttonsReleased, int trigger) {
+		int normX = (int) (getWidth() * (x + 0.5));
+		int normY = (int) -(getHeight() * (y - 0.5));
+		mouseX = normX;
+		mouseY = normY;
+		try {
+			if ((buttonsPushed & UpdateListener.ButtonCircle) != 0) {
+				if (selecting) {
+					// cancel current selection
+					for (Node n : selectedThisRound) {
+						n.setSelected(false);
+						size = 0;
+					}
+					selecting = false;
+				} else {
+					// Deselect all
+					for (Node n : nodes) {
+						n.setSelected(false);
+					}
+				}
+			}
+			if ((buttonsPushed & UpdateListener.ButtonCross) != 0) {
+				if (!selecting) {
+					// select all
+					for (Node n : nodes) {
+						n.setSelected(true);
+					}
+				}
+			}
+			if ((buttonsPushed & UpdateListener.ButtonTriangle) != 0) {
+				// moveClient.setLaserTop(0);
+			}
+			if ((buttonsPushed & UpdateListener.ButtonSquare) != 0) {
+				// moveClient.setLaserLeft(0);
+			}
+			if ((buttonsPushed & UpdateListener.ButtonMove) != 0) {
+				// right click from before
+				if (selecting && !selectedThisRound.isEmpty()) {
+					selectedThisRound.get(selectedThisRound.size() - 1).toggleSelected();
+				} else if(!selecting){
+					deselecting = true;
+					ensureCapacity();
+					points[size][0] = normX;
+					points[size][1] = normY;
+					pointsDrawX[size] = normX;
+					pointsDrawY[size] = normY;
+					size++;
+				}
+			}
+			if ((buttonsHeld & UpdateListener.ButtonMove) != 0) {
+				if (deselecting) {
+					ensureCapacity();
+					points[size][0] = normX;
+					points[size][1] = normY;
+					pointsDrawX[size] = normX;
+					pointsDrawY[size] = normY;
+					size++;
+					updateSelectedNodes();
+
+				}
+			}
+			if ((buttonsPushed & UpdateListener.ButtonSelect) != 0) {
+				moveClient.disableLaser(0);
+			}
+			if ((buttonsPushed & UpdateListener.ButtonStart) != 0) {
+				moveClient.calibrateController(0);
+			}
+			if (trigger > 0) {
+				// Trigger is down - like mouse button
+				if (triggerLast == 0 && deselecting && !selectedThisRound.isEmpty()) {
+					selectedThisRound.get(selectedThisRound.size() - 1).toggleSelected();
+				} else if (!deselecting) {
+					selecting = true;
+					ensureCapacity();
+					points[size][0] = normX;
+					points[size][1] = normY;
+					pointsDrawX[size] = normX;
+					pointsDrawY[size] = normY;
+					size++;
+
+					updateSelectedNodes();
+				}
+				
+			}
+			if (selecting && (trigger < 100) || (deselecting && (buttonsReleased & UpdateListener.ButtonMove) != 0)) {
+				for (Node n : nodes) {
+					boolean thisRound = selectedThisRound.contains(n);
+					if (!thisRound && deselecting == n.selected() && n.inside(points, size)) {
+						if (!selectedThisRound.contains(n)) {
+							n.setSelected(selecting);
+						}
+					} else if (thisRound && !n.inside(points, size)) {
+						n.setSelected(deselecting);
+						selectedThisRound.remove(n);
+					}
+				}
+
+				size = 0;
+				selecting = false;
+				deselecting = false;
+				selected = null;
+				selectedThisRound.clear();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			triggerLast = trigger;
+			this.repaint();
+		}
+
+	}
+
+	@Override
+	public void noController() {
+		// Do nothing. You don't really care
+
+	}
+
+	private void updateSelectedNodes() {
+		for (Node n : nodes) {
+			boolean thisRound = selectedThisRound.contains(n);
+			if (!thisRound && deselecting == n.selected() && n.inside(points, size)) {
+				if (!selectedThisRound.contains(n)) {
+					n.setSelected(selecting);
+					selectedThisRound.add(n);
+				}
+			} else if (thisRound && !n.inside(points, size)) {
+				n.setSelected(deselecting);
+				selectedThisRound.remove(n);
+			}
+		}
+	}
 }
