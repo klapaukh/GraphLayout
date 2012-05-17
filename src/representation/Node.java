@@ -429,7 +429,15 @@ public class Node {
 		}
 
 		if (im != null) {
-			g.drawImage(im, (int) x + width / 2 - imWidth / 2, (int) y, imWidth, height, null);
+			int imx = (int) x + width / 2 - imWidth / 2;
+			int imy = (int) y;
+			g.drawImage(im, imx, imy, imWidth, height, null);
+			if(selected){
+				g.setColor(Color.green);
+				int [] xpoints = {imx, imx + imWidth/4, imx+imWidth, imx + imWidth/4};
+				int[] ypoints =  {imy + 3* height/4, imy+height, imy, imy + 7*height/8};
+				g.fillPolygon(xpoints, ypoints, 4);
+			}
 		}
 
 		int boxx = (int) x + (width / 2) - (textWidth / 2) - HORIZONTAL_PADDING / 2;

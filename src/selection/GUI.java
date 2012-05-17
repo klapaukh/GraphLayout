@@ -399,7 +399,7 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 				}
 			}
 			if ((buttonsPushed & UpdateListener.ButtonTriangle) != 0) {
-				// moveClient.setLaserTop(0);
+				moveClient.setTrackingColor(PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME);
 			}
 			if ((buttonsPushed & UpdateListener.ButtonSquare) != 0) {
 				// moveClient.setLaserLeft(0);
