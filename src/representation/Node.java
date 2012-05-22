@@ -428,22 +428,27 @@ public class Node {
 			this.width = textWidth + HORIZONTAL_PADDING;
 		}
 
-		if (im != null) {
-			int imx = (int) x + width / 2 - imWidth / 2;
-			int imy = (int) y;
-			g.drawImage(im, imx, imy, imWidth, height, null);
-			if(selected){
-				g.setColor(Color.green);
-				int [] xpoints = {imx, imx + imWidth/4, imx+imWidth, imx + imWidth/4};
-				int[] ypoints =  {imy + 3* height/4, imy+height, imy, imy + 7*height/8};
-				g.fillPolygon(xpoints, ypoints, 4);
-			}
-		}
-
 		int boxx = (int) x + (width / 2) - (textWidth / 2) - HORIZONTAL_PADDING / 2;
 		int boxy = (int) y + height - textheight;
 		int boxWidth = textWidth + HORIZONTAL_PADDING;
 		int boxHeight = textheight;
+		
+		
+		if (im != null) {
+			int imx = (int) x + width / 2 - imWidth / 2;
+			int imy = (int) y;
+			int imheight = height - boxHeight;
+			g.drawImage(im, imx, imy, imWidth, height, null);
+			if(selected){
+				g.setColor(Color.green);
+				int [] xpoints = {imx, imx + imWidth/4, imx+imWidth, imx + imWidth/4};
+				int[] ypoints =  {imy + 1* imheight/2, imy+imheight, imy, imy + 3*imheight/4};
+				g.fillPolygon(xpoints, ypoints, 4);
+				g.setColor(Color.BLACK);
+				g.drawPolygon(xpoints, ypoints, 4);
+			}
+		}
+
 
 		if (selected) {
 			g.setColor(Color.yellow);

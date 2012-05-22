@@ -822,9 +822,9 @@ public class Graph {
 		buildGraph(def.getObjects(), def.getRelations());
 	}
 
-	public void readGraceDot(String fileName) {
+	public void readGraceDot(String fileName, String image) {
 		try {
-			GraceDotParser def = new GraceDotParser(new File(fileName));
+			GraceDotParser def = new GraceDotParser(new File(fileName),image);
 			buildGraph(def.getObjects(), def.getRelations());
 		} catch (Throwable t) {
 			t.printStackTrace();

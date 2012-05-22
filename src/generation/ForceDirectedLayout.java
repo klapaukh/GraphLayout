@@ -79,9 +79,9 @@ public class ForceDirectedLayout extends JPanel implements MouseListener, MouseM
 		buildGraph(def.getObjects(), def.getRelations());
 	}
 
-	public void readGraceDot(String fileName) {
+	public void readGraceDot(String fileName, String image) {
 		try {
-			GraceDotParser def = new GraceDotParser(new File(fileName));
+			GraceDotParser def = new GraceDotParser(new File(fileName),image);
 			buildGraph(def.getObjects(), def.getRelations());
 		} catch (Throwable t) {
 			t.printStackTrace();
@@ -402,12 +402,12 @@ public class ForceDirectedLayout extends JPanel implements MouseListener, MouseM
 			System.out.println("Degree Based Charge");
 		}
 	}
-	
+
 	private static String toAnalysisString(long forceMode) {
 		StringBuilder s = new StringBuilder();
-		
+
 		if ((forceMode & Graph.COULOMBS_LAW) != 0) {
-//			s.append('H');
+			// s.append('H');
 		}
 		if ((forceMode & Graph.HOOKES_LAW) != 0) {
 			s.append('H');
@@ -427,15 +427,14 @@ public class ForceDirectedLayout extends JPanel implements MouseListener, MouseM
 		if ((forceMode & Graph.COLLISIONS) != 0) {
 			s.append('C');
 		}
-		 if ((forceMode & Graph.FULL_COLLISIONS) != 0) {
-			 s.append('F');
-		 }
+		if ((forceMode & Graph.FULL_COLLISIONS) != 0) {
+			s.append('F');
+		}
 		if ((forceMode & Graph.WRAP_AROUND_CHARGES) != 0) {
 			s.append('A');
 		}
 		return s.toString();
 	}
-	
 
 	@Override
 	public void componentResized(ComponentEvent e) {
@@ -564,7 +563,11 @@ public class ForceDirectedLayout extends JPanel implements MouseListener, MouseM
 			g.iterMax = maxIter;
 			g.epsilon = cutOfEnergy;
 
-			g.readGraphML(prefix + folder + File.separator + file, nodeImage);
+			if (file.endsWith("graphml")) {
+				g.readGraphML(prefix + folder + File.separator + file, nodeImage);
+			}else if(file.endsWith("dot")){
+				g.readGraceDot(prefix + folder + File.separator + file, nodeImage);
+			}
 
 			Font font = new Font("Arial", Font.PLAIN, 12);
 			FontMetrics metrics = new FontMetrics(font) {
@@ -577,7 +580,7 @@ public class ForceDirectedLayout extends JPanel implements MouseListener, MouseM
 
 			g.countLabels();
 			PrintStream image = new PrintStream(new File(file + "." + g.forceMode + ".rend"));
-			PrintStream data =  new PrintStream(new File(file + "." + g.forceMode + ".dat"));
+			PrintStream data = new PrintStream(new File(file + "." + g.forceMode + ".dat"));
 
 			g.printRender(image);
 
@@ -688,6 +691,5 @@ public class ForceDirectedLayout extends JPanel implements MouseListener, MouseM
 		}
 
 	}
-
 
 }

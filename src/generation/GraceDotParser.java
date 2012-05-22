@@ -15,7 +15,7 @@ public class GraceDotParser {
 	Set<Atom> objects;
 	Map<String, List<Relation>> relations; // Map name -> neighbors
 
-	public GraceDotParser(File file) throws FileNotFoundException {
+	public GraceDotParser(File file, String image) throws FileNotFoundException {
 		objects = new HashSet<Atom>();
 		relations = new TreeMap<String, List<Relation>>();
 		Scanner scan = new Scanner(file);
@@ -28,18 +28,18 @@ public class GraceDotParser {
 			if ((!started && line.contains("{")) || (started && line.trim().equals("}"))) {
 				continue;
 			}
-			String[] parts = line.split("\\s*->\\s*");
+			String[] parts = line.split("\\s*-[>-]\\s*");
 			if (parts.length != 2) {
 				continue;
 			}
 
-			Atom n1 = new Atom("Node", parts[0].trim());
-			Atom n2 = new Atom("Node", parts[1].trim().replaceAll(";$", ""));
+			Atom n1 = new Atom(image, parts[0].trim());
+			Atom n2 = new Atom(image, parts[1].trim().replaceAll(";$", ""));
 			if (!objects.contains(n1)) {
 				objects.add(n1);
 			}
-			if (!objects.contains(n1)) {
-				objects.add(n1);
+			if (!objects.contains(n2)) {
+				objects.add(n2);
 			}
 
 			List<Relation> l = relations.get(n1.name);
@@ -47,7 +47,7 @@ public class GraceDotParser {
 				l = new ArrayList<Relation>();
 				relations.put(n1.name, l);
 			}
-			Relation r = new Relation("", n2.name);
+			Relation r = new Relation("dd", n2.name);
 			if(!l.contains(r)){
 				l.add(r);
 			}
