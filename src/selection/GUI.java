@@ -7,8 +7,10 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,15 +23,14 @@ import javax.swing.event.MouseInputListener;
 
 import nz.ac.vuw.ecs.moveme.PSMoveClient;
 import nz.ac.vuw.ecs.moveme.UpdateListener;
-
 import representation.Node;
 import representation.SpriteLibrary;
 
-public class GUI extends JComponent implements MouseInputListener, UpdateListener {
+public class GUI extends JComponent implements MouseInputListener,
+		UpdateListener {
 
 	private static final long serialVersionUID = 2173693118914351514L;
 	private static final int INITIAL_CAPACITY = 100;
-	private JFrame frame;
 	private List<Node> nodes;
 	private double[][] points;
 	private boolean selecting, deselecting;
@@ -42,9 +43,12 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 	private List<Node> selectedThisRound;
 	private PSMoveClient moveClient;
 	private int mouseX, mouseY;
+	private BufferedWriter out;
 
-	public GUI(String filename) throws IOException {
-		moveClient = new PSMoveClient();
+	public GUI(SpriteLibrary s, PSMoveClient m, BufferedWriter out)
+			throws IOException {
+		moveClient = m;
+		this.out = out;
 		moveClient.registerListener(this);
 		nodes = new ArrayList<Node>();
 		selectedThisRound = new ArrayList<Node>();
@@ -54,35 +58,16 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 		start = new ArrayList<Integer>();
 		end = new ArrayList<Integer>();
 		label = new ArrayList<String>();
-		this.sprites = new SpriteLibrary();
+		this.sprites = s;
 		size = 0;
 		mouseX = mouseY = -100;
 
 		selecting = false;
 		deselecting = false;
 		selected = null;
-		frame = new JFrame("Graph Renderer");
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-		frame.setSize(screenSize);
-		frame.setUndecorated(true);
+
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setLayout(new BorderLayout());
-		frame.getContentPane().add(this, BorderLayout.CENTER);
-
-		loadGraph(filename);
-
-		frame.setVisible(true);
-
-		try {
-			moveClient.connect("130.195.11.193", 7899);
-			moveClient.delayChange(2);
-		} catch (IOException e) {
-			// Don't fail if move doesn't connect
-			e.printStackTrace();
-		}
-		repaint();
 	}
 
 	public void loadGraph(String filename) {
@@ -108,7 +93,8 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 					int y = Integer.parseInt(props[3]);
 					int width = Integer.parseInt(props[4]);
 					int height = Integer.parseInt(props[5]);
-					nodes.add(new Node(x, y, width, height, label, type, sprites, 1, 1));
+					nodes.add(new Node(x, y, width, height, label, type,
+							sprites, 1, 1));
 
 					for (int i = 6; i < props.length; i += 2) {
 						int end = Integer.parseInt(props[i]);
@@ -127,8 +113,10 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 			System.out.println("Generating Random Graph");
 			int numNodes = (int) (Math.random() * 30 + 10);
 			for (int i = 0; i < numNodes; i++) {
-				nodes.add(new Node((int) (Math.random() * 800), (int) (Math.random() * 800), (int) (Math.random() * 40 + 10),
-						(int) (Math.random() * 40 + 10), randString(5), randType(), sprites, 1, 1));
+				nodes.add(new Node((int) (Math.random() * 800), (int) (Math
+						.random() * 800), (int) (Math.random() * 40 + 10),
+						(int) (Math.random() * 40 + 10), randString(5),
+						randType(), sprites, 1, 1));
 			}
 
 			int numEdges = (int) (Math.random() * numNodes / 2 + numNodes / 2);
@@ -205,13 +193,15 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 	public void mousePressed(MouseEvent e) {
 		if (selecting || deselecting) {
 			if (e.getButton() == MouseEvent.BUTTON2) {
-				selectedThisRound.get(selectedThisRound.size() - 1).toggleSelected();
+				selectedThisRound.get(selectedThisRound.size() - 1)
+						.toggleSelected();
 			} else {
 				if (size > 0)
 					size--;
 				for (Node n : nodes) {
 					boolean thisRound = selectedThisRound.contains(n);
-					if (!thisRound && deselecting == n.selected() && n.inside(points, size)) {
+					if (!thisRound && deselecting == n.selected()
+							&& n.inside(points, size)) {
 						if (!selectedThisRound.contains(n)) {
 							n.setSelected(selecting);
 							selectedThisRound.add(n);
@@ -246,10 +236,12 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		if ((selecting && e.getButton() == MouseEvent.BUTTON1) || (deselecting && e.getButton() == MouseEvent.BUTTON3)) {
+		if ((selecting && e.getButton() == MouseEvent.BUTTON1)
+				|| (deselecting && e.getButton() == MouseEvent.BUTTON3)) {
 			for (Node n : nodes) {
 				boolean thisRound = selectedThisRound.contains(n);
-				if (!thisRound && deselecting == n.selected() && n.inside(points, size)) {
+				if (!thisRound && deselecting == n.selected()
+						&& n.inside(points, size)) {
 					if (!selectedThisRound.contains(n)) {
 						n.setSelected(selecting);
 					}
@@ -290,7 +282,8 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 
 			for (Node n : nodes) {
 				boolean thisRound = selectedThisRound.contains(n);
-				if (!thisRound && deselecting == n.selected() && n.inside(points, size)) {
+				if (!thisRound && deselecting == n.selected()
+						&& n.inside(points, size)) {
 					if (!selectedThisRound.contains(n)) {
 						n.setSelected(selecting);
 						selectedThisRound.add(n);
@@ -328,17 +321,9 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 		}
 	}
 
-	public static void main(String args[]) throws IOException {
-		if(args.length != 1){
-			System.err.println("Requires 1 parameter which is the filename");
-			System.exit(0);
-		}
-		new GUI(args[0]);
-
-	}
-
 	@Override
-	public void positionUpdate(int buttonsPushed, int buttonsHeld, int buttonsReleased, int trigger) {
+	public void positionUpdate(int buttonsPushed, int buttonsHeld,
+			int buttonsReleased, int trigger) {
 		try {
 			if ((buttonsPushed & UpdateListener.ButtonCircle) != 0) {
 				moveClient.setLaserRight(0);
@@ -362,7 +347,9 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 				moveClient.calibrateController(0);
 			}
 			if (trigger > 100) {
-				moveClient.setTrackingColor(PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME);
+				moveClient.setTrackingColor(PSMoveClient.PICK_FOR_ME,
+						PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME,
+						PSMoveClient.PICK_FOR_ME);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -373,11 +360,24 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 	int triggerLast = 0;
 
 	@Override
-	public void positionUpdate(float x, float y, int buttonsPushed, int buttonsHeld, int buttonsReleased, int trigger) {
+	public void positionUpdate(float x, float y, int buttonsPushed,
+			int buttonsHeld, int buttonsReleased, int trigger) {
 		int normX = (int) (getWidth() * (x + 0.5));
 		int normY = (int) -(getHeight() * (y - 0.5));
 		mouseX = normX;
 		mouseY = normY;
+		
+		try {
+			out.write("" + mouseX);
+			out.write("," + mouseY);
+			out.write("," + buttonsPushed);
+			out.write("," + buttonsHeld);
+			out.write("," + buttonsReleased);
+			out.write("," + trigger);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 		try {
 			if ((buttonsPushed & UpdateListener.ButtonCircle) != 0) {
 				if (selecting) {
@@ -403,7 +403,9 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 				}
 			}
 			if ((buttonsPushed & UpdateListener.ButtonTriangle) != 0) {
-				moveClient.setTrackingColor(PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME);
+				moveClient.setTrackingColor(PSMoveClient.PICK_FOR_ME,
+						PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME,
+						PSMoveClient.PICK_FOR_ME);
 			}
 			if ((buttonsPushed & UpdateListener.ButtonSquare) != 0) {
 				// moveClient.setLaserLeft(0);
@@ -411,8 +413,9 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 			if ((buttonsPushed & UpdateListener.ButtonMove) != 0) {
 				// right click from before
 				if (selecting && !selectedThisRound.isEmpty()) {
-					selectedThisRound.get(selectedThisRound.size() - 1).toggleSelected();
-				} else if(!selecting){
+					selectedThisRound.get(selectedThisRound.size() - 1)
+							.toggleSelected();
+				} else if (!selecting) {
 					deselecting = true;
 					ensureCapacity();
 					points[size][0] = normX;
@@ -442,8 +445,10 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 			}
 			if (trigger > 0) {
 				// Trigger is down - like mouse button
-				if (triggerLast == 0 && deselecting && !selectedThisRound.isEmpty()) {
-					selectedThisRound.get(selectedThisRound.size() - 1).toggleSelected();
+				if (triggerLast == 0 && deselecting
+						&& !selectedThisRound.isEmpty()) {
+					selectedThisRound.get(selectedThisRound.size() - 1)
+							.toggleSelected();
 				} else if (!deselecting) {
 					selecting = true;
 					ensureCapacity();
@@ -455,12 +460,15 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 
 					updateSelectedNodes();
 				}
-				
+
 			}
-			if (selecting && (trigger < 100) || (deselecting && (buttonsReleased & UpdateListener.ButtonMove) != 0)) {
+			if (selecting
+					&& (trigger < 100)
+					|| (deselecting && (buttonsReleased & UpdateListener.ButtonMove) != 0)) {
 				for (Node n : nodes) {
 					boolean thisRound = selectedThisRound.contains(n);
-					if (!thisRound && deselecting == n.selected() && n.inside(points, size)) {
+					if (!thisRound && deselecting == n.selected()
+							&& n.inside(points, size)) {
 						if (!selectedThisRound.contains(n)) {
 							n.setSelected(selecting);
 						}
@@ -494,7 +502,8 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 	private void updateSelectedNodes() {
 		for (Node n : nodes) {
 			boolean thisRound = selectedThisRound.contains(n);
-			if (!thisRound && deselecting == n.selected() && n.inside(points, size)) {
+			if (!thisRound && deselecting == n.selected()
+					&& n.inside(points, size)) {
 				if (!selectedThisRound.contains(n)) {
 					n.setSelected(selecting);
 					selectedThisRound.add(n);
@@ -504,5 +513,47 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 				selectedThisRound.remove(n);
 			}
 		}
+	}
+
+	public static void main(String args[]) throws IOException {
+		if (args.length != 1) {
+			System.err.println("Requires 1 parameter which is the filename");
+			System.exit(0);
+		}
+
+		JFrame frame = new JFrame("Graph Renderer");
+		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		frame.setSize(screenSize);
+		frame.setUndecorated(true);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setLayout(new BorderLayout());
+
+		// AsynchronousFileChannel output;
+		// try{
+		// output = AsynchronousFileChannel.open((new
+		// File("output.data")).toPath(), StandardOpenOption.READ);
+		// }catch (IOException e){
+		// e.printStackTrace();
+		// }catch(SecurityException e){
+		// e.printStackTrace();
+		// }
+
+		BufferedWriter output = new BufferedWriter(
+				new FileWriter("output.data"));
+		SpriteLibrary sprites = new SpriteLibrary();
+		PSMoveClient client = new PSMoveClient();
+		try {
+			client.connect("130.195.11.193", 7899);
+			client.delayChange(2);
+		} catch (IOException e) {
+			System.err.println("Connection to PSMove server failed");
+		}
+
+		GUI gui = new GUI(sprites, client, output);
+		gui.loadGraph(args[0]);
+
+		frame.getContentPane().add(gui, BorderLayout.CENTER);
+		frame.setVisible(true);
+
 	}
 }
