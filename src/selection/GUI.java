@@ -43,7 +43,7 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 	private PSMoveClient moveClient;
 	private int mouseX, mouseY;
 
-	public GUI() throws IOException {
+	public GUI(String filename) throws IOException {
 		moveClient = new PSMoveClient();
 		moveClient.registerListener(this);
 		nodes = new ArrayList<Node>();
@@ -71,7 +71,7 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 		frame.setLayout(new BorderLayout());
 		frame.getContentPane().add(this, BorderLayout.CENTER);
 
-		loadGraph("examplef.txt");
+		loadGraph(filename);
 
 		frame.setVisible(true);
 
@@ -329,7 +329,11 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 	}
 
 	public static void main(String args[]) throws IOException {
-		new GUI();
+		if(args.length != 1){
+			System.err.println("Requires 1 parameter which is the filename");
+			System.exit(0);
+		}
+		new GUI(args[0]);
 
 	}
 
