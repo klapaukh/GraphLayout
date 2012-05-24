@@ -24,3 +24,4 @@ random-dag
 .Rhistory
 *.rend
 *.dat
+*.data
