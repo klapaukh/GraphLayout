@@ -190,6 +190,7 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 	public void mousePressed(MouseEvent e) {
 		if (selecting || deselecting) {
 			if (e.getButton() == MouseEvent.BUTTON2) {
+				if(selectedThisRound.size()> 0)
 				selectedThisRound.get(selectedThisRound.size() - 1).toggleSelected();
 			} else {
 				if (size > 0)
@@ -504,7 +505,7 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 		final JFrame frame = new JFrame("Graph Renderer");
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		frame.setSize(screenSize);
-		frame.setUndecorated(true); // TODO REmove
+		frame.setUndecorated(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new BorderLayout());
 
@@ -520,7 +521,7 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 
 		BufferedWriter output = new BufferedWriter(new FileWriter("output.data"));
 		SpriteLibrary sprites = new SpriteLibrary();
-		PSMoveClient client = new PSMoveClient();
+		final PSMoveClient client = new PSMoveClient();
 		try {
 			client.connect("130.195.11.193", 7899);
 			client.delayChange(2);
@@ -548,6 +549,7 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 			System.out.println(guis.size() + " GUIS loaded");
 		}
 
+		client.registerListener(guis.get(0));
 		frame.getContentPane().add(guis.get(0), BorderLayout.CENTER);
 
 		KeyListener list = new KeyListener() {
@@ -561,6 +563,7 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 					if (count < guis.size() - 1) {
 						frame.getContentPane().removeAll();
 						frame.getContentPane().add(guis.get(++count), BorderLayout.CENTER);
+						client.registerListener(guis.get(count));
 						frame.validate();
 						frame.repaint();
 					}
@@ -570,6 +573,7 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 					if (count > 0) {
 						frame.getContentPane().removeAll();
 						frame.getContentPane().add(guis.get(--count), BorderLayout.CENTER);
+						client.registerListener(guis.get(count));
 						frame.validate();
 						frame.repaint();
 					}
