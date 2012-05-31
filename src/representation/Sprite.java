@@ -24,7 +24,7 @@ public class Sprite implements Comparable<Sprite> {
 		if (imgSrc.equals("")) {
 			throw new IllegalArgumentException("Image path must be given for all sprites in database");
 		}
-		this.imgSrc = imgSrc.split("\t");
+		this.imgSrc = imgSrc.split("\\s+");
 
 	}
 
