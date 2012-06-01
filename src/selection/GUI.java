@@ -190,8 +190,8 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 	public void mousePressed(MouseEvent e) {
 		if (selecting || deselecting) {
 			if (e.getButton() == MouseEvent.BUTTON2) {
-				if(selectedThisRound.size()> 0)
-				selectedThisRound.get(selectedThisRound.size() - 1).toggleSelected();
+				if (selectedThisRound.size() > 0)
+					selectedThisRound.get(selectedThisRound.size() - 1).toggleSelected();
 			} else {
 				if (size > 0)
 					size--;
@@ -558,6 +558,20 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 			@Override
 			public void keyPressed(KeyEvent arg0) {
 				switch (arg0.getKeyChar()) {
+				case 'r':
+				case 'R':
+					if (guis.size() > 21) {
+						guis.remove(count);
+						files.remove(count);
+						if (count == guis.size()) {
+							count -= 2;
+						} else {
+							count--;
+						}
+					} else {
+						System.err.println("Target size of 20 already reached");
+						break;
+					}
 				case 'q':
 				case 'Q':
 					if (count < guis.size() - 1) {
@@ -578,13 +592,14 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 						frame.repaint();
 					}
 					break;
-				case 'r':
-				case 'R':
-					System.err.println(files.get(count));
-					break;
 				case 'c':
 				case 'C':
-					System.out.println(files.get(count));
+					System.out.println("");
+					System.out.println("");
+					System.out.println("");
+					for (String s : files) {
+						System.out.println(s);
+					}
 					break;
 				}
 

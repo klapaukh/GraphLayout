@@ -25,3 +25,4 @@ random-dag
 *.rend
 *.dat
 *.data
+*.old
