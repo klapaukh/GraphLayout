@@ -434,10 +434,12 @@ public class Node {
 		int boxHeight = textheight;
 		
 		
+		int imx = (int) x + width / 2 - imWidth / 2;
+		int imy = (int) y;
+		int imheight = height - boxHeight;
+		
+		g.drawRect(imx, imy, imWidth, height);
 		if (im != null) {
-			int imx = (int) x + width / 2 - imWidth / 2;
-			int imy = (int) y;
-			int imheight = height - boxHeight;
 			g.drawImage(im, imx, imy, imWidth, height, null);
 			if(selected){
 				g.setColor(Color.green);

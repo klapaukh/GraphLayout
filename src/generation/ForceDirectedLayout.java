@@ -478,10 +478,11 @@ public class ForceDirectedLayout extends JPanel implements MouseListener, MouseM
 			f.setVisible(true);
 
 			l.g.iterMax = 10000;
+			l.g.forceMode = Graph.HOOKES_LAW | Graph.COULOMBS_LAW | Graph.CHARGED_LABELS | Graph.CHARGED_WALLS;
 
 			// l.animateWikiAlgorithm();
 			long start = System.currentTimeMillis();
-			l.readGraphML("../Syntax Highlight/rome/" + "grafo10036.31.graphml");
+			l.readGraceDot("./" + "4480.dot", "Abb");
 			// createRandomGraph(l);
 			l.animate(0);
 			int[] overlaps = l.getOverlaps();

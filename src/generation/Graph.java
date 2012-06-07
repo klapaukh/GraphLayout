@@ -47,7 +47,7 @@ public class Graph {
 	public double epsilonStep = 0.05;
 	public double timestep = 0.01; // timestep in seconds
 	public int defaultWidth = 80, defaultHeight = 80, defaultMass = 2;
-	public double defaultCharge = 3, defaultLabelCharge = 1;
+	public double defaultCharge = 3, defaultLabelCharge = 3;
 	public double totalVertexCharge = 10, totalLabelCharge = 1;
 	public double wallCharge = 10000;// 0.03;
 	public double k = 0.2;
@@ -507,15 +507,31 @@ public class Graph {
 
 		// Repulisive labels
 		if ((forceMode & CHARGED_LABELS) != 0) {
+			//Node v label
 			for (Node n : nodes) {
 				for (Arc a : edges) {
-					if (!a.contains(n)) {
+					if (a.left != a.right) { //not a self loop
 						coulombRepulsion(n, a.label, solution);
 						n.addForce(solution);
 						solution.multiply(-1);
 						a.left.addForce(solution);
 						a.right.addForce(solution);
 					}
+				}
+			}
+			
+			//Label v Label
+			for(int i =0 ; i < edges.size(); i++){
+				for( int j = i+1; j < edges.size();j++){
+					Arc a1 = edges.get(i);
+					Arc a2 = edges.get(j);
+					
+					coulombRepulsion(a1.label, a2.label, solution);
+					a1.left.addForce(solution);
+					a2.right.addForce(solution);
+					solution.multiply(-1);
+					a2.left.addForce(solution);
+					a2.right.addForce(solution);
 				}
 			}
 		}
