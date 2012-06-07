@@ -560,7 +560,6 @@ public class ForceDirectedLayout extends JPanel implements MouseListener, MouseM
 			}
 
 			Graph g = new Graph(forceMode);
-			g.epsilon = 50;
 			g.iterMax = maxIter;
 			g.epsilon = cutOfEnergy;
 
