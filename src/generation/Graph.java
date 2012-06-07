@@ -1029,4 +1029,60 @@ public class Graph {
 			out.println();
 		}
 	}
+
+	public double angleDeviation() {
+		int total = 0;
+		int count = 0; 
+		for(int i= 0; i < edges.size(); i++){
+			for(int j=i+1;j<edges.size(); j++){
+				Arc a1 =edges.get(i);
+				Arc a2 =edges.get(j);
+
+				if(a1.left == a1.right || a2.left == a2.right){
+					//Ignore self loops;
+					continue;
+				}
+				Node corner =null, n1=null, n2=null;
+				if(a1.contains(a2.left)){
+					corner = a2.left;
+					n1 = a2.right;
+					n2 = a1.other(a2.left);
+				}else if(a1.contains(a2.right)){
+					corner = a2.right;
+					n1 = a2.left;
+					n2 = a1.other(a2.right);
+				}
+				
+				if(corner == null){
+					continue;
+				}
+				
+				double cx = corner.x() + corner.width()/2;
+				double cy = corner.y() + corner.height()/2;
+				
+				double n1x = n1.x() + n1.width()/2;
+				double n1y = n1.y() + n1.height()/2;
+				
+				double n2x = n2.x() + n2.width()/2;
+				double n2y = n2.y() + n2.height()/2;
+				
+				double B = Math.sqrt(Math.pow(cx-n1x,2) + Math.pow(cy-n1y,2));
+				double C = Math.sqrt(Math.pow(cx-n2x,2) + Math.pow(cy-n2y,2));
+				double A = Math.sqrt(Math.pow(n1x-n2x,2) + Math.pow(n1y-n2y,2));
+				
+				double cosa = ((C*C)+(B*B) - (A*A))/(2*B*C);
+				double a = Math.acos(cosa);
+				
+				double error = a- (360.0/corner.degree());
+				
+				total += error * error;
+				count++;
+				
+			}
+		}
+		if(count != 0){
+			total /= count;
+		}
+		return Math.sqrt(total);
+	}
 }

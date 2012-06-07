@@ -492,6 +492,7 @@ public class ForceDirectedLayout extends JPanel implements MouseListener, MouseM
 					+ (overlaps[0] + overlaps[1] + overlaps[2]) + ") overlaps");
 			start = System.currentTimeMillis();
 
+			System.out.println(String.format("%.3f", l.g.angleDeviation()));
 			while (true) {
 				try {
 					Thread.sleep(1000);
@@ -678,6 +679,9 @@ public class ForceDirectedLayout extends JPanel implements MouseListener, MouseM
 
 			headings.add("Layout Height");
 			values.add(String.format("%.3f", g.layoutHeight()));
+			
+			headings.add("Average Deviation From Ideal Arc Seperation");
+			values.add(String.format("%.3f", g.angleDeviation()));
 
 			for (int i = 0; i < headings.size(); i++) {
 				data.print(headings.get(i));
