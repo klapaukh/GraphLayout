@@ -385,10 +385,10 @@ public class ForceDirectedLayout extends JPanel implements MouseListener, MouseM
 		}
 		if ((mode & Graph.CHARGED_LABELS) != 0) {
 			System.out.println("Charged Labels");
+		}		
+		if ((mode & Graph.CHARGED_EDGE_CENTERS) != 0) {
+			System.out.println("Charged Edge Centres");
 		}
-		// if ((mode & Graph.SOLID_COULOMBS_LAW) != 0) {
-		// System.out.println("Solid Charges Law");
-		// }
 		if ((mode & Graph.FULL_COLLISIONS) != 0) {
 			System.out.println("Full Collisions");
 		}
@@ -420,6 +420,9 @@ public class ForceDirectedLayout extends JPanel implements MouseListener, MouseM
 		}
 		if ((forceMode & Graph.CHARGED_LABELS) != 0) {
 			s.append('E');
+		}
+		if ((forceMode & Graph.CHARGED_EDGE_CENTERS) != 0) {
+			s.append('G');
 		}
 		if ((forceMode & Graph.DEGREE_BASED_CHARGE) != 0) {
 			s.append('D');
@@ -478,7 +481,7 @@ public class ForceDirectedLayout extends JPanel implements MouseListener, MouseM
 			f.setVisible(true);
 
 			l.g.iterMax = 10000;
-			l.g.forceMode = Graph.HOOKES_LAW | Graph.COULOMBS_LAW | Graph.CHARGED_LABELS | Graph.CHARGED_WALLS;
+			l.g.forceMode = Graph.HOOKES_LAW | Graph.COULOMBS_LAW | Graph.COLLISIONS;
 
 			// l.animateWikiAlgorithm();
 			long start = System.currentTimeMillis();
@@ -507,20 +510,24 @@ public class ForceDirectedLayout extends JPanel implements MouseListener, MouseM
 		} else {
 			// test sets from http://www.graphdrawing.org/data.html
 
-			if (args.length != 8) {
-				System.err.println("Usage: java ForceDirectedLayout prefix dataSet file nodeImage maxIterations energyCutOff baseForce extraforces");
+			if (args.length != 9) {
+				System.err.println("Usage: java ForceDirectedLayout prefix dataSet file nodeImage maxIterations energyCutOff baseForce repulsiveForce extraForces");
 				System.err.println("Base Forces");
 				System.err.println("0: Hooke's Law");
 				System.err.println("1: Log Law");
 
-				System.err.println("\nForces:");
-				System.err.println("1: Coulomb's Law");
-				System.err.println("2: Charged Walls");
-				System.err.println("4: Charged Labels");
-				System.err.println("8: Collisions");
-				System.err.println("16: Degree Based Charge");
-				System.err.println("32: Wrap Around Charges");
+				System.err.println("\nRepulsive Forces:");
+				System.err.println("0: Coulomb's Law Only");
+				System.err.println("1: Charged Labels");
+				System.err.println("2: Charged Label Centres");		
+				
+				System.err.println("\nExtra Forces:");
+				System.err.println("1: Charged Walls");
+				System.err.println("2: Collisions");
+				System.err.println("4: Degree Based Charge");
+				System.err.println("8: Wrap Around Charges");
 
+				
 				System.exit(-1);
 			}
 
@@ -532,31 +539,37 @@ public class ForceDirectedLayout extends JPanel implements MouseListener, MouseM
 			int maxIter = Integer.parseInt(args[4]);
 			int cutOfEnergy = Integer.parseInt(args[5]);
 			int baseforces = Integer.parseInt(args[6]);
-			int extraforces = Integer.parseInt(args[7]);
+			int respulsiveforces = Integer.parseInt(args[7]);
+			int extraforces = Integer.parseInt(args[8]);
 
 			forceMode = 0;
 
+			//Spring force
 			if (baseforces == 0) {
 				forceMode |= Graph.HOOKES_LAW;
 			} else if (baseforces == 1) {
 				forceMode |= Graph.HOOKES_LOG_LAW;
 			}
-			if ((extraforces & 0x1) != 0) {
-				forceMode |= Graph.COULOMBS_LAW;
+			
+			//Repulsion
+			forceMode |= Graph.COULOMBS_LAW;
+			if (respulsiveforces == 1) {
+				forceMode |= Graph.CHARGED_LABELS;
+			} else if (respulsiveforces == 2) {
+				forceMode |= Graph.CHARGED_EDGE_CENTERS;
 			}
-			if ((extraforces & 0x2) != 0) {
+			
+			//Extra forces
+			if ((extraforces & 0x1) != 0) {
 				forceMode |= Graph.CHARGED_WALLS;
 			}
-			if ((extraforces & 0x4) != 0) {
-				forceMode |= Graph.CHARGED_LABELS;
-			}
-			if ((extraforces & 0x8) != 0) {
+			if ((extraforces & 0x2) != 0) {
 				forceMode |= Graph.COLLISIONS;
 			}
-			if ((extraforces & 0x10) != 0) {
+			if ((extraforces & 0x4) != 0) {
 				forceMode |= Graph.DEGREE_BASED_CHARGE;
 			}
-			if ((extraforces & 0x20) != 0) {
+			if ((extraforces & 0x8) != 0) {
 				forceMode |= Graph.WRAP_AROUND_CHARGES;
 			}
 

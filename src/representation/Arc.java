@@ -7,6 +7,7 @@ public class Arc {
 	public final Node left;
 	public final Node right;
 	public final Node label;
+	public final Node edgeCenter;
 	public final String name;
 	
 	public Arc(Node left, Node right, String name, double labelCharge,  double mass, SpriteLibrary l){
@@ -14,14 +15,22 @@ public class Arc {
 		this.right = right;
 		this.name = name;
 		label = new Node((left.x() + right.x())/2, (left.y() + right.y())/2,10,10,"label","label",l, labelCharge, mass );
+		
+		edgeCenter = new Node((left.x() + right.x())/2, (left.y() + right.y())/2,1,1,"label","label",l, labelCharge, mass );
 	}
 	
 	public void drawArc(Graphics2D g){
 		left.drawArc(g, right, name, label);
+
+		edgeCenter.setPosition((left.x() + right.x())/2, (left.y() + right.y())/2);
+		edgeCenter.finaliseMove();
 	}
 	
 	public void updateArc(FontMetrics m){
 		left.updateArc(m, right, name, label);
+		
+		edgeCenter.setPosition((left.x() + right.x())/2, (left.y() + right.y())/2);
+		edgeCenter.finaliseMove();
 	}
 	
 	public Node other(Node n){

@@ -36,7 +36,7 @@ public class Graph {
 	public static final long COLLISIONS = 0x4;
 	public static final long COULOMBS_LAW = 0x8;
 	public static final long CHARGED_LABELS = 0x10;
-	// public static final long SOLID_COULOMBS_LAW = 0x20;
+	public static final long CHARGED_EDGE_CENTERS = 0x20;
 	public static final long FULL_COLLISIONS = 0x40;
 	public static final long HOOKES_LOG_LAW = 0x80;
 	public static final long DEGREE_BASED_CHARGE = 0x100;
@@ -510,7 +510,7 @@ public class Graph {
 			//Node v label
 			for (Node n : nodes) {
 				for (Arc a : edges) {
-					if (a.left != a.right) { //not a self loop
+					if (!a.contains(n)) { //don't repel your own nodes
 						coulombRepulsion(n, a.label, solution);
 						n.addForce(solution);
 						solution.multiply(-1);
@@ -522,11 +522,12 @@ public class Graph {
 			
 			//Label v Label
 			for(int i =0 ; i < edges.size(); i++){
-				for( int j = i+1; j < edges.size();j++){
+				for( int j = i+1; j < edges.size();j++){  //Repel ALL other labels
 					Arc a1 = edges.get(i);
 					Arc a2 = edges.get(j);
 					
-					coulombRepulsion(a1.label, a2.label, solution);
+					coulombRepulsion(a1.label, a2.label, solution); 
+					
 					a1.left.addForce(solution);
 					a2.right.addForce(solution);
 					solution.multiply(-1);
@@ -536,6 +537,38 @@ public class Graph {
 			}
 		}
 
+		
+		// Repulisive labels
+		if ((forceMode & CHARGED_EDGE_CENTERS) != 0) {
+			//Node v label
+			for (Node n : nodes) {
+				for (Arc a : edges) {
+					if (!a.contains(n)) { //don't repel your own nodes
+						coulombRepulsion(n, a.edgeCenter, solution);
+						n.addForce(solution);
+						solution.multiply(-1);
+						a.left.addForce(solution);
+						a.right.addForce(solution);
+					}
+				}
+			}
+			
+			//Label v Label
+			for(int i =0 ; i < edges.size(); i++){
+				for( int j = i+1; j < edges.size();j++){  //Repel ALL other labels
+					Arc a1 = edges.get(i);
+					Arc a2 = edges.get(j);
+					
+					coulombRepulsion(a1.edgeCenter, a2.edgeCenter, solution);
+					
+					a1.left.addForce(solution);
+					a2.right.addForce(solution);
+					solution.multiply(-1);
+					a2.left.addForce(solution);
+					a2.right.addForce(solution);
+				}
+			}
+		} 
 		// Hookes Law
 		if ((forceMode & HOOKES_LAW) != 0 || (forceMode & HOOKES_LOG_LAW) != 0) {
 			for (Node n : nodes) {
@@ -682,12 +715,48 @@ public class Graph {
 			}
 		}
 		if ((forceMode & COLLISIONS) != 0) {
+			//Node v Node
 			for (int i = 0; i < nodes.size(); i++) {
 				for (int j = i + 1; j < nodes.size(); j++) {
 					if (nodes.get(i).overlapps(nodes.get(j))) {// Nodes have hit
 						// System.out.println("Collided");
 						nodes.get(i).collided(nodes.get(j), coefficientOfRestitution);
 						nodes.get(j).collided(nodes.get(i), coefficientOfRestitution);
+					}
+				}// next node
+			}
+			
+			//Node V label
+			for (int i = 0; i < nodes.size(); i++) {
+				for (int j = 0; j < edges.size(); j++) {
+					Node n1 = nodes.get(i);
+					Arc a1 = edges.get(j);
+					if (n1.overlapps(a1.label)) {// Nodes have hit
+						// System.out.println("Collided");
+						n1.collided(a1.left, coefficientOfRestitution);
+						n1.collided(a1.right, coefficientOfRestitution);
+						a1.left.collided(n1, coefficientOfRestitution);
+						a1.right.collided(n1, coefficientOfRestitution);
+						
+					}
+				}// next node
+			}
+			
+			for (int i = 0; i < edges.size(); i++) {
+				for (int j = i + 1; j < edges.size(); j++) {
+					Arc a1 = edges.get(i);
+					Arc a2 = edges.get(j);
+					if (a1.label.overlapps(a2.label)) {// Nodes have hit
+						// System.out.println("Collided");
+						a1.left.collided(a2.left, coefficientOfRestitution);
+						a1.left.collided(a2.right, coefficientOfRestitution);
+						a1.right.collided(a2.left, coefficientOfRestitution);
+						a1.right.collided(a2.right, coefficientOfRestitution);
+						
+						a2.left.collided(a1.left, coefficientOfRestitution);
+						a2.left.collided(a1.right, coefficientOfRestitution);
+						a2.right.collided(a1.left, coefficientOfRestitution);
+						a2.right.collided(a1.right, coefficientOfRestitution);
 					}
 				}// next node
 			}
