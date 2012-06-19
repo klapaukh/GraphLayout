@@ -510,8 +510,8 @@ public class ForceDirectedLayout extends JPanel implements MouseListener, MouseM
 		} else {
 			// test sets from http://www.graphdrawing.org/data.html
 
-			if (args.length != 9) {
-				System.err.println("Usage: java ForceDirectedLayout prefix dataSet file nodeImage maxIterations energyCutOff baseForce repulsiveForce extraForces");
+			if (args.length != 10) {
+				System.err.println("Usage: java ForceDirectedLayout prefix dataSet file nodeImage maxIterations energyCutOff baseForce repulsiveForce extraForces maxSeconds");
 				System.err.println("Base Forces");
 				System.err.println("0: Hooke's Law");
 				System.err.println("1: Log Law");
@@ -541,6 +541,7 @@ public class ForceDirectedLayout extends JPanel implements MouseListener, MouseM
 			int baseforces = Integer.parseInt(args[6]);
 			int respulsiveforces = Integer.parseInt(args[7]);
 			int extraforces = Integer.parseInt(args[8]);
+			long maxMillis = Long.parseLong(args[9])*1000;
 
 			forceMode = 0;
 
@@ -589,7 +590,7 @@ public class ForceDirectedLayout extends JPanel implements MouseListener, MouseM
 			};
 
 			long start = System.currentTimeMillis();
-			int steps = g.simulate(metrics);
+			int steps = g.simulate(metrics, maxMillis, start);
 			long end = System.currentTimeMillis();
 
 			g.countLabels();
@@ -677,6 +678,9 @@ public class ForceDirectedLayout extends JPanel implements MouseListener, MouseM
 			long time = end - start;
 			headings.add("time");
 			values.add("" + time);
+			
+			headings.add("Time Limit");
+			values.add("" + maxMillis);
 
 			headings.add("Total Edge Lengths");
 			values.add(String.format("%.3f", g.getTotalEdgeLength()));

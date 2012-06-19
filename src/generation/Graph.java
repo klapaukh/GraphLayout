@@ -725,8 +725,7 @@ public class Graph {
 					}
 				}// next node
 			}
-			
-			//Node V label
+					//Node V label
 			for (int i = 0; i < nodes.size(); i++) {
 				for (int j = 0; j < edges.size(); j++) {
 					Node n1 = nodes.get(i);
@@ -944,11 +943,12 @@ public class Graph {
 		lock.release();
 	}
 
-	public int simulate(FontMetrics metrics) {
+	public int simulate(FontMetrics metrics, long maxTime, long startTime) {
 		init();
 		double kineticEnergy = Double.MAX_VALUE;
 		int i = 0;
-		while (kineticEnergy > epsilon && i < iterMax) {
+		long limit = maxTime + startTime;
+		while (kineticEnergy > epsilon && i < iterMax && limit > System.currentTimeMillis()) {
 			kineticEnergy = oneIterWikiAlgorith();
 			for (Arc a : edges) {
 				a.updateArc(metrics);
