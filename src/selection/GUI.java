@@ -28,7 +28,8 @@ import nz.ac.vuw.ecs.moveme.UpdateListener;
 import representation.Node;
 import representation.SpriteLibrary;
 
-public class GUI extends JComponent implements MouseInputListener, UpdateListener {
+public class GUI extends JComponent implements MouseInputListener,
+		UpdateListener {
 
 	private static final long serialVersionUID = 2173693118914351514L;
 	private static final int INITIAL_CAPACITY = 100;
@@ -46,7 +47,8 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 	private int mouseX, mouseY;
 	private BufferedWriter out;
 
-	public GUI(SpriteLibrary s, PSMoveClient m, BufferedWriter out) throws IOException {
+	public GUI(SpriteLibrary s, PSMoveClient m, BufferedWriter out)
+			throws IOException {
 		moveClient = m;
 		this.out = out;
 		moveClient.registerListener(this);
@@ -93,7 +95,8 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 					int y = Integer.parseInt(props[3]);
 					int width = Integer.parseInt(props[4]);
 					int height = Integer.parseInt(props[5]);
-					nodes.add(new Node(x, y, width, height, label, type, sprites, 1, 1));
+					nodes.add(new Node(x, y, width, height, label, type,
+							sprites, 1, 1));
 
 					for (int i = 6; i < props.length; i += 2) {
 						int end = Integer.parseInt(props[i]);
@@ -112,8 +115,10 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 			System.out.println("Generating Random Graph");
 			int numNodes = (int) (Math.random() * 30 + 10);
 			for (int i = 0; i < numNodes; i++) {
-				nodes.add(new Node((int) (Math.random() * 800), (int) (Math.random() * 800), (int) (Math.random() * 40 + 10),
-						(int) (Math.random() * 40 + 10), randString(5), randType(), sprites, 1, 1));
+				nodes.add(new Node((int) (Math.random() * 800), (int) (Math
+						.random() * 800), (int) (Math.random() * 40 + 10),
+						(int) (Math.random() * 40 + 10), randString(5),
+						randType(), sprites, 1, 1));
 			}
 
 			int numEdges = (int) (Math.random() * numNodes / 2 + numNodes / 2);
@@ -147,6 +152,53 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 			s.append((char) ((char) (Math.random() * 26) + 'a'));
 		}
 		return s.toString();
+	}
+
+	public String toSVG() {
+		StringBuilder output = new StringBuilder();
+		output.append("<?xml version=\"1.0\" encoding=\"ISO-8859-1\" standalone=\"no\"?>\n");
+		output.append("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 20010904//EN\"\n");
+		output.append("\"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">\n");
+		output.append("<svg xmlns=\"http://www.w3.org/2000/svg\"\n");
+		output.append("xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:space=\"preserve\"\n");
+		output.append("width=\"1920px\" height=\"1080px\"\n");
+		output.append("viewBox=\"0 0 1920 1080\"\n");
+		output.append("zoomAndPan=\"disable\" >\n");
+
+		for(int i =0; i < start.size(); i++){
+			Node s = nodes.get(start.get(i));
+			Node e = nodes.get(end.get(i));
+			String l = label.get(i);
+			
+			//Draw an appropriate arc
+			output.append("<line x1=\"");
+			output.append(s.x() + s.width()/2);
+			output.append("\" y1=\"");
+			output.append(s.y() + s.height()/2);
+			output.append("\" x2=\"");
+			output.append(e.x() + e.width()/2);
+			output.append("\" y1=\"");
+			output.append(e.y() + e.height()/2);
+			output.append("\" />\n");
+			
+			//Draw the String
+			
+			output.append("<text x=\"");
+			output.append((s.x() + e.x())/2);
+			output.append("\" y=\"");
+			output.append((s.y() + e.y())/2);
+			output.append("\" font-size=\"12\" text-anchor=\"start\">");
+			output.append(l);
+			output.append("</text>\n");
+		}
+		
+		
+		for(Node n : nodes){
+			output.append(n.toSVG());
+		}
+		
+		output.append("</svg>\n");
+		return output.toString();
 	}
 
 	public void paint(Graphics g) {
@@ -191,13 +243,15 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 		if (selecting || deselecting) {
 			if (e.getButton() == MouseEvent.BUTTON2) {
 				if (selectedThisRound.size() > 0)
-					selectedThisRound.get(selectedThisRound.size() - 1).toggleSelected();
+					selectedThisRound.get(selectedThisRound.size() - 1)
+							.toggleSelected();
 			} else {
 				if (size > 0)
 					size--;
 				for (Node n : nodes) {
 					boolean thisRound = selectedThisRound.contains(n);
-					if (!thisRound && deselecting == n.selected() && n.inside(points, size)) {
+					if (!thisRound && deselecting == n.selected()
+							&& n.inside(points, size)) {
 						if (!selectedThisRound.contains(n)) {
 							n.setSelected(selecting);
 							selectedThisRound.add(n);
@@ -232,10 +286,12 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		if ((selecting && e.getButton() == MouseEvent.BUTTON1) || (deselecting && e.getButton() == MouseEvent.BUTTON3)) {
+		if ((selecting && e.getButton() == MouseEvent.BUTTON1)
+				|| (deselecting && e.getButton() == MouseEvent.BUTTON3)) {
 			for (Node n : nodes) {
 				boolean thisRound = selectedThisRound.contains(n);
-				if (!thisRound && deselecting == n.selected() && n.inside(points, size)) {
+				if (!thisRound && deselecting == n.selected()
+						&& n.inside(points, size)) {
 					if (!selectedThisRound.contains(n)) {
 						n.setSelected(selecting);
 					}
@@ -276,7 +332,8 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 
 			for (Node n : nodes) {
 				boolean thisRound = selectedThisRound.contains(n);
-				if (!thisRound && deselecting == n.selected() && n.inside(points, size)) {
+				if (!thisRound && deselecting == n.selected()
+						&& n.inside(points, size)) {
 					if (!selectedThisRound.contains(n)) {
 						n.setSelected(selecting);
 						selectedThisRound.add(n);
@@ -315,7 +372,8 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 	}
 
 	@Override
-	public void positionUpdate(int buttonsPushed, int buttonsHeld, int buttonsReleased, int trigger) {
+	public void positionUpdate(int buttonsPushed, int buttonsHeld,
+			int buttonsReleased, int trigger) {
 		try {
 			if ((buttonsPushed & UpdateListener.ButtonCircle) != 0) {
 				moveClient.setLaserRight(0);
@@ -339,7 +397,9 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 				moveClient.calibrateController(0);
 			}
 			if (trigger > 100) {
-				moveClient.setTrackingColor(PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME);
+				moveClient.setTrackingColor(PSMoveClient.PICK_FOR_ME,
+						PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME,
+						PSMoveClient.PICK_FOR_ME);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -350,7 +410,8 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 	int triggerLast = 0;
 
 	@Override
-	public void positionUpdate(float x, float y, int buttonsPushed, int buttonsHeld, int buttonsReleased, int trigger) {
+	public void positionUpdate(float x, float y, int buttonsPushed,
+			int buttonsHeld, int buttonsReleased, int trigger) {
 		int normX = (int) (getWidth() * (x + 0.5));
 		int normY = (int) -(getHeight() * (y - 0.5));
 		mouseX = normX;
@@ -393,7 +454,9 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 				}
 			}
 			if ((buttonsPushed & UpdateListener.ButtonTriangle) != 0) {
-				moveClient.setTrackingColor(PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME);
+				moveClient.setTrackingColor(PSMoveClient.PICK_FOR_ME,
+						PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME,
+						PSMoveClient.PICK_FOR_ME);
 			}
 			if ((buttonsPushed & UpdateListener.ButtonSquare) != 0) {
 				// moveClient.setLaserLeft(0);
@@ -401,7 +464,8 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 			if ((buttonsPushed & UpdateListener.ButtonMove) != 0) {
 				// right click from before
 				if (selecting && !selectedThisRound.isEmpty()) {
-					selectedThisRound.get(selectedThisRound.size() - 1).toggleSelected();
+					selectedThisRound.get(selectedThisRound.size() - 1)
+							.toggleSelected();
 				} else if (!selecting) {
 					deselecting = true;
 					ensureCapacity();
@@ -432,8 +496,10 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 			}
 			if (trigger > 0) {
 				// Trigger is down - like mouse button
-				if (triggerLast == 0 && deselecting && !selectedThisRound.isEmpty()) {
-					selectedThisRound.get(selectedThisRound.size() - 1).toggleSelected();
+				if (triggerLast == 0 && deselecting
+						&& !selectedThisRound.isEmpty()) {
+					selectedThisRound.get(selectedThisRound.size() - 1)
+							.toggleSelected();
 				} else if (!deselecting) {
 					selecting = true;
 					ensureCapacity();
@@ -447,10 +513,13 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 				}
 
 			}
-			if (selecting && (trigger < 100) || (deselecting && (buttonsReleased & UpdateListener.ButtonMove) != 0)) {
+			if (selecting
+					&& (trigger < 100)
+					|| (deselecting && (buttonsReleased & UpdateListener.ButtonMove) != 0)) {
 				for (Node n : nodes) {
 					boolean thisRound = selectedThisRound.contains(n);
-					if (!thisRound && deselecting == n.selected() && n.inside(points, size)) {
+					if (!thisRound && deselecting == n.selected()
+							&& n.inside(points, size)) {
 						if (!selectedThisRound.contains(n)) {
 							n.setSelected(selecting);
 						}
@@ -484,7 +553,8 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 	private void updateSelectedNodes() {
 		for (Node n : nodes) {
 			boolean thisRound = selectedThisRound.contains(n);
-			if (!thisRound && deselecting == n.selected() && n.inside(points, size)) {
+			if (!thisRound && deselecting == n.selected()
+					&& n.inside(points, size)) {
 				if (!selectedThisRound.contains(n)) {
 					n.setSelected(selecting);
 					selectedThisRound.add(n);
@@ -519,7 +589,8 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 		// e.printStackTrace();
 		// }
 
-		BufferedWriter output = new BufferedWriter(new FileWriter("output.data"));
+		BufferedWriter output = new BufferedWriter(
+				new FileWriter("output.data"));
 		SpriteLibrary sprites = new SpriteLibrary();
 		final PSMoveClient client = new PSMoveClient();
 		try {
@@ -576,7 +647,8 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 				case 'Q':
 					if (count < guis.size() - 1) {
 						frame.getContentPane().removeAll();
-						frame.getContentPane().add(guis.get(++count), BorderLayout.CENTER);
+						frame.getContentPane().add(guis.get(++count),
+								BorderLayout.CENTER);
 						client.registerListener(guis.get(count));
 						frame.validate();
 						frame.repaint();
@@ -586,7 +658,8 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 				case 'W':
 					if (count > 0) {
 						frame.getContentPane().removeAll();
-						frame.getContentPane().add(guis.get(--count), BorderLayout.CENTER);
+						frame.getContentPane().add(guis.get(--count),
+								BorderLayout.CENTER);
 						client.registerListener(guis.get(count));
 						frame.validate();
 						frame.repaint();
