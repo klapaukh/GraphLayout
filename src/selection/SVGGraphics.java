@@ -41,9 +41,9 @@ public class SVGGraphics extends Graphics2D {
 		s.append("xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:space=\"preserve\"\n");
 		s.append("width=\"");
 		s.append(1920);
-		s.append("\"px\" height=\"");
+		s.append("px\" height=\"");
 		s.append(1080);
-		s.append("\"px\"\n");
+		s.append("px\"\n");
 		s.append("viewBox=\"0 0 ");
 		s.append(width);
 		s.append(' ');
@@ -89,9 +89,9 @@ public class SVGGraphics extends Graphics2D {
 		s.append(color);
 		s.append("\" opacity=\"");
 		s.append(String.format("%.2f", this.alpha));
-		s.append("\">");
+		s.append("\" font-size=\"10pt\" text-anchor=\"start\" font-family=\"Arial\" >");
 		s.append(str);
-		s.append("</text>");
+		s.append("</text>\n");
 	}
 
 	@Override
@@ -247,7 +247,7 @@ public class SVGGraphics extends Graphics2D {
 
 	@Override
 	public FontRenderContext getFontRenderContext() {
-		throw new RuntimeException("Method Not Yet Implemented");
+		return ((Graphics2D)(frame.getGraphics())).getFontRenderContext();
 	}
 
 	@Override
@@ -279,7 +279,7 @@ public class SVGGraphics extends Graphics2D {
 
 	@Override
 	public Font getFont() {
-		throw new RuntimeException("Method Not Yet Implemented");
+		return frame.getGraphics().getFont();
 	}
 
 	@Override

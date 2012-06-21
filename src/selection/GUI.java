@@ -633,6 +633,11 @@ public class GUI extends JComponent implements MouseInputListener,
 						System.out.println(s);
 					}
 					break;
+				case 'p':
+				case 'P':
+					String s = guis.get(count).toSVG();
+					System.out.println(s);
+					
 				}
 
 			}
