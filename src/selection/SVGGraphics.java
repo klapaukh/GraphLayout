@@ -25,15 +25,15 @@ import java.awt.image.renderable.RenderableImage;
 import java.text.AttributedCharacterIterator;
 import java.util.Map;
 
-import javax.swing.JFrame;
+import javax.swing.JComponent;
 
 public class SVGGraphics extends Graphics2D {
 	private double alpha = 1;
-	public JFrame frame;
+	public JComponent frame;
 	private String color = "rgb(0,0,0)";
 	private StringBuilder s = new StringBuilder();
 
-	public SVGGraphics(int width, int height, JFrame frame) {
+	public SVGGraphics(int width, int height, JComponent frame) {
 		s.append("<?xml version=\"1.0\" encoding=\"ISO-8859-1\" standalone=\"no\"?>\n");
 		s.append("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 20010904//EN\"\n");
 		s.append("\"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">\n");
@@ -512,6 +512,10 @@ public class SVGGraphics extends Graphics2D {
 	@Override
 	public void dispose() {
 		throw new RuntimeException("Method Not Yet Implemented");
+	}
+	
+	public String toString(){
+		return s.toString() + "</svg>";
 	}
 
 }

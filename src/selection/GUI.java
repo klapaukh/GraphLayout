@@ -155,50 +155,9 @@ public class GUI extends JComponent implements MouseInputListener,
 	}
 
 	public String toSVG() {
-		StringBuilder output = new StringBuilder();
-		output.append("<?xml version=\"1.0\" encoding=\"ISO-8859-1\" standalone=\"no\"?>\n");
-		output.append("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 20010904//EN\"\n");
-		output.append("\"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">\n");
-		output.append("<svg xmlns=\"http://www.w3.org/2000/svg\"\n");
-		output.append("xmlns:xlink=\"http://www.w3.org/1999/xlink\" xml:space=\"preserve\"\n");
-		output.append("width=\"1920px\" height=\"1080px\"\n");
-		output.append("viewBox=\"0 0 1920 1080\"\n");
-		output.append("zoomAndPan=\"disable\" >\n");
-
-		for(int i =0; i < start.size(); i++){
-			Node s = nodes.get(start.get(i));
-			Node e = nodes.get(end.get(i));
-			String l = label.get(i);
-			
-			//Draw an appropriate arc
-			output.append("<line x1=\"");
-			output.append(s.x() + s.width()/2);
-			output.append("\" y1=\"");
-			output.append(s.y() + s.height()/2);
-			output.append("\" x2=\"");
-			output.append(e.x() + e.width()/2);
-			output.append("\" y1=\"");
-			output.append(e.y() + e.height()/2);
-			output.append("\" />\n");
-			
-			//Draw the String
-			
-			output.append("<text x=\"");
-			output.append((s.x() + e.x())/2);
-			output.append("\" y=\"");
-			output.append((s.y() + e.y())/2);
-			output.append("\" font-size=\"12\" text-anchor=\"start\">");
-			output.append(l);
-			output.append("</text>\n");
-		}
-		
-		
-		for(Node n : nodes){
-			output.append(n.toSVG());
-		}
-		
-		output.append("</svg>\n");
-		return output.toString();
+		SVGGraphics g = new SVGGraphics(1920,1080,this);
+		this.paint(g);
+		return g.toString();
 	}
 
 	public void paint(Graphics g) {

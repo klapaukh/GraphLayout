@@ -669,21 +669,4 @@ public class Node {
 
 	}
 
-	public String toSVG() {
-		StringBuilder s = new StringBuilder();
-		
-		s.append("<rect ");
-		s.append("x=\"");
-		s.append(x);
-		s.append("\" y=\"");
-		s.append(y);
-		s.append("\" width=\"");
-		s.append(width);
-		s.append("\" height=\"");
-		s.append(height);
-		s.append("\" fill=\"black\" />\n");
-		
-		return s.toString();
-	}
-
 }
