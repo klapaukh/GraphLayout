@@ -552,12 +552,12 @@ public class GUI extends JComponent implements MouseInputListener,
 				new FileWriter("output.data"));
 		SpriteLibrary sprites = new SpriteLibrary();
 		final PSMoveClient client = new PSMoveClient();
-		try {
-			client.connect("130.195.11.193", 7899);
-			client.delayChange(2);
-		} catch (IOException e) {
-			System.err.println("Connection to PSMove server failed");
-		}
+//		try {
+//			client.connect("130.195.11.193", 7899);
+//			client.delayChange(2);
+//		} catch (IOException e) {
+//			System.err.println("Connection to PSMove server failed");
+//		}
 
 		final List<GUI> guis = new ArrayList<GUI>();
 		final List<String> files = new ArrayList<String>();
@@ -567,13 +567,16 @@ public class GUI extends JComponent implements MouseInputListener,
 			gui.loadGraph(args[0]);
 			guis.add(gui);
 		} else {
+			boolean forces = Math.random() < 0.5;
+			output.write(forces? "L" : "LWED" + "\n");
 			System.out.println("Loading all guis");
 			Scanner scan = new Scanner(new File(args[0]));
 			while (scan.hasNextLine()) {
 				String file = scan.nextLine();
 				files.add(file);
 				GUI gui = new GUI(sprites, client, output);
-				gui.loadGraph(file + ".410.rend");
+				
+				gui.loadGraph(file + (forces ? ".136.rend" : ".410.rend"));
 				guis.add(gui);
 			}
 			System.out.println(guis.size() + " GUIS loaded");
