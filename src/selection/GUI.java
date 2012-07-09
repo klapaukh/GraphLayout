@@ -573,7 +573,7 @@ public class GUI extends JComponent implements MouseInputListener,
 				String file = scan.nextLine();
 				files.add(file);
 				GUI gui = new GUI(sprites, client, output);
-				gui.loadGraph(file + ".283.rend");
+				gui.loadGraph(file + ".410.rend");
 				guis.add(gui);
 			}
 			System.out.println(guis.size() + " GUIS loaded");
@@ -590,7 +590,7 @@ public class GUI extends JComponent implements MouseInputListener,
 				switch (arg0.getKeyChar()) {
 				case 'r':
 				case 'R':
-					if (guis.size() > 21) {
+					if (guis.size() > 20) {
 						guis.remove(count);
 						files.remove(count);
 						if (count == guis.size()) {
