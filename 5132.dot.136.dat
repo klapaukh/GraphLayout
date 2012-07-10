@@ -1,4 +1,0 @@
-
-====RESULTS====
-Data Set,File,#Nodes,#Edges,Node Height,Node Width,Node Node Overlaps, Node Label Overlaps,Label Label Overlaps,Edge Crossings,Iterations,Max Iterations,Base Force,Forces,Final Energy,Cut of Energy,Total Area Needed,Area Drawn,Canvas Width,Canvas Height,time,Time Limit,Total Edge Lengths,Mean Edge Length,Variance of Edge Length,Layout Width,Layout Height,Average Deviation From Ideal Arc Seperation
-partials,5132.dot,20,30,80,80,0,4,1,16,10000,10000,Log,L,25.474,3,134300,133620,1920,1080,3459,9999000,6559.000,218.633,2330.802,901.692,844.684,93.702
