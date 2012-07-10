@@ -46,7 +46,7 @@ public class GUI extends JComponent implements MouseInputListener,
 	private PSMoveClient moveClient;
 	private int mouseX, mouseY;
 	private BufferedWriter out;
-
+	
 	public GUI(SpriteLibrary s, PSMoveClient m, BufferedWriter out)
 			throws IOException {
 		moveClient = m;
@@ -525,6 +525,10 @@ public class GUI extends JComponent implements MouseInputListener,
 		}
 	}
 
+	
+	private static final List<GUI> guis = new ArrayList<GUI>();
+	private static final List<String> files = new ArrayList<String>();
+	private static int count = 0;
 	public static void main(String args[]) throws IOException {
 		if (args.length != 1) {
 			System.err.println("Requires 1 parameter which is the filename");
@@ -559,8 +563,7 @@ public class GUI extends JComponent implements MouseInputListener,
 //			System.err.println("Connection to PSMove server failed");
 //		}
 
-		final List<GUI> guis = new ArrayList<GUI>();
-		final List<String> files = new ArrayList<String>();
+
 
 		if (args[0].endsWith("dot")) {
 			GUI gui = new GUI(sprites, client, output);
@@ -569,6 +572,7 @@ public class GUI extends JComponent implements MouseInputListener,
 		} else {
 			boolean forces = Math.random() < 0.5;
 			output.write(forces? "L" : "LWED" + "\n");
+			output.flush();
 			System.out.println("Loading all guis");
 			Scanner scan = new Scanner(new File(args[0]));
 			while (scan.hasNextLine()) {
@@ -586,8 +590,6 @@ public class GUI extends JComponent implements MouseInputListener,
 		frame.getContentPane().add(guis.get(0), BorderLayout.CENTER);
 
 		KeyListener list = new KeyListener() {
-			private int count = 0;
-
 			@Override
 			public void keyPressed(KeyEvent arg0) {
 				switch (arg0.getKeyChar()) {
