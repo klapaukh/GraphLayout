@@ -420,6 +420,7 @@ public class Node {
 	}
 
 	public void draw(Graphics g) {
+		if(label.isEmpty()) return;
 		FontMetrics m = g.getFontMetrics();
 		Rectangle2D met = m.getStringBounds(label, g);
 		int textheight = (int) Math.ceil(met.getHeight());
