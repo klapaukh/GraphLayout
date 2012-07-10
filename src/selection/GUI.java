@@ -378,6 +378,7 @@ public class GUI extends JComponent implements MouseInputListener,
 
 		try {
 			out.write("" + System.currentTimeMillis());
+			out.write("," +files.get(count));
 			out.write("," + mouseX);
 			out.write("," + mouseY);
 			out.write("," + buttonsPushed);
