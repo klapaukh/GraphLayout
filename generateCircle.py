@@ -14,4 +14,4 @@ for angle in range(0,numSteps,1):
             end = "," + str(numSteps-1)+ ","
     if(angle < numSteps -1):
         end = end + "," + str(angle+1) + ","
-    print ",Select," + str(int(cx + width* math.cos(angle*max/numSteps))) +","+ str(int(cy + height * math.sin(angle*max/numSteps))) + ",1,1" + end   
+    print ",Test," + str(int(cx + width* math.cos(angle*max/numSteps))) +","+ str(int(cy + height * math.sin(angle*max/numSteps))) + ",1,1" + end   
