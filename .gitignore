@@ -3,6 +3,7 @@ bin/
 *.sh
 examples/
 tests/
+.pydevproject
 .project
 .classpath
 .directory
