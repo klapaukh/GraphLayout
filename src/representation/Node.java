@@ -136,14 +136,14 @@ public class Node {
 		this.selected = !this.selected;
 	}
 
-	public void setSelected(boolean selected){
+	public void setSelected(boolean selected) {
 		this.selected = selected;
 	}
-	
-	public boolean selected(){
+
+	public boolean selected() {
 		return selected;
 	}
-	
+
 	public void toggleMovement() {
 		mobile = !mobile;
 	}
@@ -432,42 +432,41 @@ public class Node {
 		int boxy = (int) y + height - textheight;
 		int boxWidth = textWidth + HORIZONTAL_PADDING;
 		int boxHeight = textheight;
-		
-		
+
 		int imx = (int) x + width / 2 - imWidth / 2;
 		int imy = (int) y;
 		int imheight = height - boxHeight;
-		
+
 		g.drawRect(imx, imy, imWidth, height);
 		if (im != null) {
 			g.drawImage(im, imx, imy, imWidth, height, null);
-			if(selected){
+			if (selected) {
 				g.setColor(Color.green);
-				int [] xpoints = {imx, imx + imWidth/4, imx+imWidth, imx + imWidth/4};
-				int[] ypoints =  {imy + 1* imheight/2, imy+imheight, imy, imy + 3*imheight/4};
+				int[] xpoints = { imx, imx + imWidth / 4, imx + imWidth, imx + imWidth / 4 };
+				int[] ypoints = { imy + 1 * imheight / 2, imy + imheight, imy, imy + 3 * imheight / 4 };
 				g.fillPolygon(xpoints, ypoints, 4);
 				g.setColor(Color.BLACK);
 				g.drawPolygon(xpoints, ypoints, 4);
 			}
 		}
 
+		if (!label.isEmpty()) {
+			if (selected) {
+				g.setColor(Color.yellow);
+			} else if (!mobile) {
+				g.setColor(Color.pink);
+			} else {
+				g.setColor(Color.cyan);
+			}
 
-		if (selected) {
-			g.setColor(Color.yellow);
-		} else if (!mobile) {
-			g.setColor(Color.pink);
-		} else {
-			g.setColor(Color.cyan);
+			g.fillRect(boxx, boxy, boxWidth, boxHeight);
+
+			g.setColor(Color.BLACK);
+
+			g.drawRect(boxx, boxy, boxWidth, boxHeight);
+
+			g.drawString(label, (int) x + (width / 2) - (textWidth / 2), (int) y + height - m.getMaxDescent());
 		}
-
-		g.fillRect(boxx, boxy, boxWidth, boxHeight);
-
-		g.setColor(Color.BLACK);
-
-		g.drawRect(boxx, boxy, boxWidth, boxHeight);
-
-		g.drawString(label, (int) x + (width / 2) - (textWidth / 2), (int) y + height - m.getMaxDescent());
-
 		double vecSize = Math.sqrt(forcex * forcex + forcey * forcey);
 		int vecx = (int) ((int) (150 * forcex / vecSize) + x + width / 2);
 		int vecy = (int) ((int) (150 * forcey / vecSize) + y + height / 2);
