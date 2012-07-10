@@ -103,7 +103,7 @@ public class GUI extends JComponent implements MouseInputListener,
 						if (nodes.size() - 1 <= end) {
 							start.add(nodes.size() - 1);
 							this.end.add(end);
-							this.label.add(props[i + 1]);
+							this.label.add(props.length >= i+1 ? "" : props[i + 1]);
 						}
 					}
 
