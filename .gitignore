@@ -23,6 +23,5 @@ rome
 random-dag
 .RData
 .Rhistory
-*.data
 *.old
 *.dot

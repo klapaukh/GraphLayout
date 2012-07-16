@@ -622,7 +622,7 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 		// e.printStackTrace();
 		// }
 
-		BufferedWriter output = new BufferedWriter(new FileWriter("output.data"));
+		BufferedWriter output = new BufferedWriter(new FileWriter("output.csv"));
 		SpriteLibrary sprites = new SpriteLibrary();
 		final PSMoveClient client = new PSMoveClient();
 		// try {
