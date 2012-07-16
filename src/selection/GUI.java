@@ -46,6 +46,7 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 	private int mouseX, mouseY;
 	private BufferedWriter out;
 	private String filename;
+	private final Changer changer;
 
 	public static final String SQUARE = "#";
 	public static final String TRIANGLE = "V";
@@ -56,7 +57,7 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 	public static final String START = "S";
 	public static final String TRIGGER = "T";
 
-	public GUI(SpriteLibrary s, PSMoveClient m, BufferedWriter out) throws IOException {
+	public GUI(SpriteLibrary s, PSMoveClient m, BufferedWriter out, Changer c) throws IOException {
 		moveClient = m;
 		this.out = out;
 		moveClient.registerListener(this);
@@ -71,6 +72,7 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 		this.sprites = s;
 		size = 0;
 		mouseX = mouseY = -100;
+		this.changer = c;
 
 		selecting = false;
 		deselecting = false;
@@ -111,7 +113,7 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 						if (nodes.size() - 1 <= end) {
 							start.add(nodes.size() - 1);
 							this.end.add(end);
-							this.label.add(props.length >= i + 1 ? "" : props[i + 1]);
+							this.label.add(props.length <= i + 1 ? "" : props[i + 1]);
 						}
 					}
 
@@ -333,44 +335,54 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 
 	@Override
 	public void positionUpdate(int buttonsPushed, int buttonsHeld, int buttonsReleased, int trigger) {
-		try {
-			if ((buttonsPushed & UpdateListener.ButtonCircle) != 0) {
-				out.write(CIRCLE);
-				moveClient.setLaserRight(0);
+		synchronized (out) {
+			try {
+				if ((buttonsPushed & UpdateListener.ButtonCircle) != 0) {
+					out.write(CIRCLE);
+					moveClient.setLaserRight(0);
+				}
+				if ((buttonsPushed & UpdateListener.ButtonCross) != 0) {
+					out.write(CROSS);
+					moveClient.setLaserBottom(0);
+				}
+				if ((buttonsPushed & UpdateListener.ButtonTriangle) != 0) {
+					out.write(TRIANGLE);
+					moveClient.setLaserTop(0);
+				}
+				if ((buttonsPushed & UpdateListener.ButtonSquare) != 0) {
+					out.write(SQUARE);
+					moveClient.setLaserLeft(0);
+				}
+				if ((buttonsPushed & UpdateListener.ButtonMove) != 0) {
+					out.write(MOVE);
+					moveClient.enableLaser(0);
+				}
+				if ((buttonsPushed & UpdateListener.ButtonSelect) != 0) {
+					out.write(SELECT);
+					moveClient.resetController(0);
+				}
+				if ((buttonsPushed & UpdateListener.ButtonStart) != 0) {
+					out.write("S");
+					moveClient.calibrateController(0);
+				}
+				if (trigger > 100) {
+					out.write(TRIGGER);
+					moveClient.setTrackingColor(PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME,
+							PSMoveClient.PICK_FOR_ME);
+				}
+				if (buttonsPushed != 0) {
+					out.write('\n');
+				}
+				out.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+				try {
+					out.write('\n');
+					out.flush();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
 			}
-			if ((buttonsPushed & UpdateListener.ButtonCross) != 0) {
-				out.write(CROSS);
-				moveClient.setLaserBottom(0);
-			}
-			if ((buttonsPushed & UpdateListener.ButtonTriangle) != 0) {
-				out.write(TRIANGLE);
-				moveClient.setLaserTop(0);
-			}
-			if ((buttonsPushed & UpdateListener.ButtonSquare) != 0) {
-				out.write(SQUARE);
-				moveClient.setLaserLeft(0);
-			}
-			if ((buttonsPushed & UpdateListener.ButtonMove) != 0) {
-				out.write(MOVE);
-				moveClient.enableLaser(0);
-			}
-			if ((buttonsPushed & UpdateListener.ButtonSelect) != 0) {
-				out.write(SELECT);
-				moveClient.resetController(0);
-			}
-			if ((buttonsPushed & UpdateListener.ButtonStart) != 0) {
-				out.write("S");
-				moveClient.calibrateController(0);
-			}
-			if (trigger > 100) {
-				out.write(TRIGGER);
-				moveClient.setTrackingColor(PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME);
-			}
-			if (buttonsPushed != 0) {
-				out.write('\n');
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 
 	}
@@ -410,126 +422,132 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 		mouseX = normX;
 		mouseY = normY;
 
-		try {
-			out.write("" + System.currentTimeMillis());
-			out.write("," + guis.get(count).filename);
-			out.write("," + mouseX);
-			out.write("," + mouseY);
-			out.write("," + buttonString(buttonsPushed));
-			out.write("," + buttonString(buttonsHeld));
-			out.write("," + buttonString(buttonsReleased));
-			out.write("," + trigger);
-			out.write('\n');
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		synchronized (out) {
+			try {
+				out.write("" + System.currentTimeMillis());
+				out.write("," + guis.get(count).filename);
+				out.write("," + mouseX);
+				out.write("," + mouseY);
+				out.write("," + buttonString(buttonsPushed));
+				out.write("," + buttonString(buttonsHeld));
+				out.write("," + buttonString(buttonsReleased));
+				out.write("," + trigger);
+				out.write('\n');
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 
-		try {
-			if ((buttonsPushed & UpdateListener.ButtonCircle) != 0) {
-				if (selecting) {
-					out.write("Selection cancelled\n");
-					// cancel current selection
-					for (Node n : selectedThisRound) {
-						n.setSelected(false);
-						size = 0;
-					}
-					selecting = false;
-				} else {
-					out.write("Deselect all\n");
-					// Deselect all
-					for (Node n : nodes) {
-						n.setSelected(false);
-					}
-				}
-			}
-			if ((buttonsPushed & UpdateListener.ButtonCross) != 0) {
-				if (!selecting) {
-					// select all
-					out.write("Select all\n");
-					for (Node n : nodes) {
-						n.setSelected(true);
-					}
-				}
-			}
-			if ((buttonsPushed & UpdateListener.ButtonTriangle) != 0) {
-				moveClient.setTrackingColor(PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME);
-			}
-			if ((buttonsPushed & UpdateListener.ButtonSquare) != 0) {
-				// moveClient.setLaserLeft(0);
-			}
-			if ((buttonsPushed & UpdateListener.ButtonMove) != 0) {
-				// right click from before
-				if (selecting && !selectedThisRound.isEmpty()) {
-					selectedThisRound.get(selectedThisRound.size() - 1).toggleSelected();
-				} else if (!selecting) {
-					deselecting = true;
-					ensureCapacity();
-					points[size][0] = normX;
-					points[size][1] = normY;
-					pointsDrawX[size] = normX;
-					pointsDrawY[size] = normY;
-					size++;
-				}
-			}
-			if ((buttonsHeld & UpdateListener.ButtonMove) != 0) {
-				if (deselecting) {
-					ensureCapacity();
-					points[size][0] = normX;
-					points[size][1] = normY;
-					pointsDrawX[size] = normX;
-					pointsDrawY[size] = normY;
-					size++;
-					updateSelectedNodes();
-
-				}
-			}
-			if ((buttonsPushed & UpdateListener.ButtonSelect) != 0) {
-				moveClient.disableLaser(0);
-			}
-			if ((buttonsPushed & UpdateListener.ButtonStart) != 0) {
-				moveClient.calibrateController(0);
-			}
-			if (trigger > 0) {
-				// Trigger is down - like mouse button
-				if (triggerLast == 0 && deselecting && !selectedThisRound.isEmpty()) {
-					selectedThisRound.get(selectedThisRound.size() - 1).toggleSelected();
-				} else if (!deselecting) {
-					selecting = true;
-					ensureCapacity();
-					points[size][0] = normX;
-					points[size][1] = normY;
-					pointsDrawX[size] = normX;
-					pointsDrawY[size] = normY;
-					size++;
-
-					updateSelectedNodes();
-				}
-
-			}
-			if (selecting && (trigger < 100) || (deselecting && (buttonsReleased & UpdateListener.ButtonMove) != 0)) {
-				for (Node n : nodes) {
-					boolean thisRound = selectedThisRound.contains(n);
-					if (!thisRound && deselecting == n.selected() && n.inside(points, size)) {
-						if (!selectedThisRound.contains(n)) {
-							n.setSelected(selecting);
+			try {
+				if ((buttonsPushed & UpdateListener.ButtonCircle) != 0) {
+					if (selecting) {
+						out.write("Selection cancelled\n");
+						// cancel current selection
+						for (Node n : selectedThisRound) {
+							n.setSelected(false);
+							size = 0;
 						}
-					} else if (thisRound && !n.inside(points, size)) {
-						n.setSelected(deselecting);
-						selectedThisRound.remove(n);
+						selecting = false;
+					} else {
+						out.write("Deselect all\n");
+						// Deselect all
+						for (Node n : nodes) {
+							n.setSelected(false);
+						}
 					}
 				}
+				if ((buttonsPushed & UpdateListener.ButtonCross) != 0) {
+					if (!selecting) {
+						// select all
+						out.write("Select all\n");
+						for (Node n : nodes) {
+							n.setSelected(true);
+						}
+					}
+				}
+				if ((buttonsPushed & UpdateListener.ButtonTriangle) != 0) {
+					moveClient.setTrackingColor(PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME,
+							PSMoveClient.PICK_FOR_ME);
+				}
+				if ((buttonsPushed & UpdateListener.ButtonSquare) != 0) {
+					// moveClient.setLaserLeft(0);
+				}
+				if ((buttonsPushed & UpdateListener.ButtonMove) != 0) {
+					// right click from before
+					if (selecting && !selectedThisRound.isEmpty()) {
+						selectedThisRound.get(selectedThisRound.size() - 1).toggleSelected();
+					} else if (!selecting) {
+						deselecting = true;
+						ensureCapacity();
+						points[size][0] = normX;
+						points[size][1] = normY;
+						pointsDrawX[size] = normX;
+						pointsDrawY[size] = normY;
+						size++;
+					}
+				}
+				if ((buttonsHeld & UpdateListener.ButtonMove) != 0) {
+					if (deselecting) {
+						ensureCapacity();
+						points[size][0] = normX;
+						points[size][1] = normY;
+						pointsDrawX[size] = normX;
+						pointsDrawY[size] = normY;
+						size++;
+						updateSelectedNodes();
 
-				size = 0;
-				selecting = false;
-				deselecting = false;
-				selected = null;
-				selectedThisRound.clear();
+					}
+				}
+				if ((buttonsPushed & UpdateListener.ButtonSelect) != 0) {
+					moveClient.disableLaser(0);
+				}
+				if ((buttonsPushed & UpdateListener.ButtonStart) != 0) {
+					moveClient.calibrateController(0);
+				}
+				if (trigger > 0) {
+					// Trigger is down - like mouse button
+					if (triggerLast == 0 && deselecting && !selectedThisRound.isEmpty()) {
+						selectedThisRound.get(selectedThisRound.size() - 1).toggleSelected();
+					} else if (!deselecting) {
+						selecting = true;
+						ensureCapacity();
+						points[size][0] = normX;
+						points[size][1] = normY;
+						pointsDrawX[size] = normX;
+						pointsDrawY[size] = normY;
+						size++;
+
+						updateSelectedNodes();
+					}
+
+				}
+				if (selecting && (trigger < 100) || (deselecting && (buttonsReleased & UpdateListener.ButtonMove) != 0)) {
+					for (Node n : nodes) {
+						boolean thisRound = selectedThisRound.contains(n);
+						if (!thisRound && deselecting == n.selected() && n.inside(points, size)) {
+							if (!selectedThisRound.contains(n)) {
+								n.setSelected(selecting);
+							}
+						} else if (thisRound && !n.inside(points, size)) {
+							n.setSelected(deselecting);
+							selectedThisRound.remove(n);
+						}
+					}
+
+					size = 0;
+					selecting = false;
+					deselecting = false;
+					selected = null;
+					selectedThisRound.clear();
+					
+					checkState();
+				}
+				out.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
+				triggerLast = trigger;
+				this.repaint();
 			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			triggerLast = trigger;
-			this.repaint();
 		}
 
 	}
@@ -555,8 +573,27 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 		}
 	}
 
-	private static final List<GUI> guis = new ArrayList<GUI>();
-	private static int count = 0;
+	
+	public void checkState() throws IOException{
+		boolean perfect = true;
+		for( Node n : nodes){
+			perfect = perfect && n.rightState(); 
+		}
+		if(perfect && changer != null){
+			this.changer.next();
+			synchronized(out){
+				out.write(""+System.currentTimeMillis());
+				out.write(",Graph Changed,");
+				out.write(GUI.guis.get(count).filename);
+				out.write("\n");
+				out.flush();
+			}
+		}
+		
+	}
+	
+	public static final List<GUI> guis = new ArrayList<GUI>();
+	public static int count = 0;
 
 	public static void main(String args[]) throws IOException {
 		if (args.length != 1) {
@@ -591,8 +628,10 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 		// System.err.println("Connection to PSMove server failed");
 		// }
 
+		Changer c = new Changer(frame, client);
+		
 		if (args[0].endsWith("dot")) {
-			GUI gui = new GUI(sprites, client, output);
+			GUI gui = new GUI(sprites, client, output,c);
 			gui.loadGraph(args[0]);
 			guis.add(gui);
 		} else {
@@ -603,8 +642,7 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 			Scanner scan = new Scanner(new File(args[0]));
 			while (scan.hasNextLine()) {
 				String file = scan.nextLine();
-				GUI gui = new GUI(sprites, client, output);
-
+				GUI gui = new GUI(sprites, client, output,c);
 				gui.loadGraph(file + (forces ? ".136.rend" : ".410.rend"));
 				guis.add(gui);
 			}
@@ -615,6 +653,7 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 		client.registerListener(guis.get(0));
 		frame.getContentPane().add(guis.get(0), BorderLayout.CENTER);
 
+		
 		KeyListener list = new KeyListener() {
 			@Override
 			public void keyPressed(KeyEvent arg0) {
@@ -682,4 +721,6 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 		frame.setVisible(true);
 
 	}
+	
+
 }

@@ -22,6 +22,7 @@ public class Node {
 	private boolean mobile;
 	private double forcex, forcey;
 	private int degree;
+	private final boolean shouldSelect;
 
 	private double nextx, nexty;
 
@@ -50,6 +51,8 @@ public class Node {
 
 		points = new double[][] { { x, y }, { x + width, y }, { x + width, y + height }, { x, y + height } };
 		nextPoints = new double[][] { { x, y }, { x + width, y }, { x + width, y + height }, { x, y + height } };
+		
+		shouldSelect = type.equalsIgnoreCase("Select");
 
 	}
 
@@ -72,6 +75,7 @@ public class Node {
 
 		points = new double[][] { { x, y }, { x + width, y }, { x + width, y + height }, { x, y + height } };
 		nextPoints = new double[][] { { x, y }, { x + width, y }, { x + width, y + height }, { x, y + height } };
+		shouldSelect = type.equalsIgnoreCase("Select");
 	}
 
 	public int degree() {
@@ -667,6 +671,10 @@ public class Node {
 			}
 		}
 
+	}
+
+	public boolean rightState() {
+		return selected == shouldSelect;
 	}
 
 }
