@@ -42,6 +42,7 @@ public class SpriteLibrary {
 //				System.out.println("Adding sprite " + name);
 				sprites.put(name,new Sprite(name,scan.nextLine().trim()));
 			}
+			scan.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			throw new IOException("Data file could not be found to read in sprite database");

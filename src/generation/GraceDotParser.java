@@ -51,10 +51,8 @@ public class GraceDotParser {
 			if(!l.contains(r)){
 				l.add(r);
 			}
-
-
-
 		}
+		scan.close();
 
 	}
 

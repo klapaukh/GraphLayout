@@ -708,6 +708,8 @@ public class ForceDirectedLayout extends JPanel implements MouseListener, MouseM
 				data.print(values.get(i));
 				data.print((i == values.size() - 1) ? "\n" : ",");
 			}
+			image.close();
+			data.close();
 
 		}
 

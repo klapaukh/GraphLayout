@@ -15,6 +15,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
@@ -117,7 +118,7 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 
 				}
 			}
-
+			scan.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			System.out.println("Generating Random Graph");
@@ -609,9 +610,9 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 				guis.add(gui);
 			}
 			System.out.println(guis.size() + " GUIS loaded");
+			scan.close();
 		}
-
-		guis.subList(4, guis.size());
+		Collections.shuffle(guis.subList(4, guis.size()));
 		client.registerListener(guis.get(0));
 		frame.getContentPane().add(guis.get(0), BorderLayout.CENTER);
 
