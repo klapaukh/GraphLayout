@@ -7,7 +7,6 @@ import java.awt.event.MouseListener;
 
 import javax.swing.JComponent;
 
-import nz.ac.vuw.ecs.moveme.PSMoveClient;
 import nz.ac.vuw.ecs.moveme.UpdateListener;
 
 public class QuestionPane extends JComponent implements UpdateListener,
@@ -22,12 +21,12 @@ public class QuestionPane extends JComponent implements UpdateListener,
 	private final GUI g1, g2;
 	private final Changer changer;
 
-	public QuestionPane(Changer changer,GUI g1, GUI g2) {
+	public QuestionPane(Changer changer, GUI g1, GUI g2) {
 		this.questions = new String[] { "Which graph layout was better?",
 				"Which did you perform faster on?" };
 		this.answers = new int[questions.length];
-		for(int i = 0 ; i < answers.length;i++){
-			answers[i]= -1;
+		for (int i = 0; i < answers.length; i++) {
+			answers[i] = -1;
 		}
 		this.changer = changer;
 		this.g1 = g1;
@@ -48,11 +47,18 @@ public class QuestionPane extends JComponent implements UpdateListener,
 		}
 
 		// Draw the graphs
+		Color shade = new Color(1.0f, 1.0f, 0f, 0.5f);
 		for (int i = 0; i < questions.length; i++) {
 			g1.drawAt(g, i * partWidth, textHeight, partWidth, graphHeight);
 			g2.drawAt(g, i * partWidth, textHeight + graphHeight, partWidth,
 					graphHeight);
+			if (answers[i] != -1) {
+				g.setColor(shade);
+				g.fillRect(i * partWidth, textHeight + answers[i] == 1 ? 0
+						: graphHeight, partWidth, partHeight);
+			}
 		}
+		g.setColor(Color.black);
 
 		// Draw Frames
 		g.drawLine(0, textHeight, getWidth(), textHeight);
@@ -77,21 +83,21 @@ public class QuestionPane extends JComponent implements UpdateListener,
 		}
 
 		for (int i = 0; i < questions.length; i++) {
-			if (x <= (i+1)*partWidth) {
-				//this is the question that has been answered
+			if (x <= (i + 1) * partWidth) {
+				// this is the question that has been answered
 				answers[i] = graph;
 				checkFinished();
 				return;
 			}
 		}
 	}
-	
-	private void checkFinished(){
+
+	private void checkFinished() {
 		boolean finished = true;
-		for(int i = 0 ; i < answers.length;i++){
+		for (int i = 0; i < answers.length; i++) {
 			finished = finished && answers[i] != -1;
 		}
-		if(finished){
+		if (finished) {
 			this.changer.next();
 		}
 	}
