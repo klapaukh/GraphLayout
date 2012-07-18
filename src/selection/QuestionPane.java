@@ -5,12 +5,7 @@ import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-import javax.swing.JComponent;
-
-import nz.ac.vuw.ecs.moveme.UpdateListener;
-
-public class QuestionPane extends JComponent implements UpdateListener,
-		MouseListener {
+public class QuestionPane extends MoveComponent implements MouseListener {
 
 	private static final long serialVersionUID = 17834150123L;
 	private static final int textHeight = 60;
@@ -23,7 +18,8 @@ public class QuestionPane extends JComponent implements UpdateListener,
 
 	public QuestionPane(Changer changer, GUI g1, GUI g2) {
 		this.questions = new String[] { "Which graph layout was better?",
-				"Which did you perform faster on?" };
+				"Which did you perform faster on?",
+				"Which did you prefer?"};
 		this.answers = new int[questions.length];
 		for (int i = 0; i < answers.length; i++) {
 			answers[i] = -1;
@@ -36,7 +32,7 @@ public class QuestionPane extends JComponent implements UpdateListener,
 	public void paint(Graphics g) {
 		partWidth = this.getWidth() / questions.length;
 
-		int graphHeight = partHeight - textHeight;
+		int graphHeight = (partHeight - textHeight)/2;
 		// TODO: Make the graph the right aspect ratio?
 
 		g.setColor(Color.black);
@@ -52,10 +48,10 @@ public class QuestionPane extends JComponent implements UpdateListener,
 			g1.drawAt(g, i * partWidth, textHeight, partWidth, graphHeight);
 			g2.drawAt(g, i * partWidth, textHeight + graphHeight, partWidth,
 					graphHeight);
-			if (answers[i] != -1) {
+			if (answers[i] == -1) {
 				g.setColor(shade);
-				g.fillRect(i * partWidth, textHeight + answers[i] == 1 ? 0
-						: graphHeight, partWidth, partHeight);
+				g.fillRect(i * partWidth, textHeight + (answers[i] == 1 ? 0
+						: graphHeight), partWidth, partHeight);
 			}
 		}
 		g.setColor(Color.black);
