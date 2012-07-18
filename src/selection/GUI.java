@@ -9,6 +9,7 @@ import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -49,6 +50,7 @@ public class GUI extends JComponent implements MouseInputListener,
 	private BufferedWriter out;
 	private String filename;
 	private final Changer changer;
+	private final BufferedImage image;
 
 	public static final String SQUARE = "#";
 	public static final String TRIANGLE = "V";
@@ -80,6 +82,8 @@ public class GUI extends JComponent implements MouseInputListener,
 		selecting = false;
 		deselecting = false;
 		selected = null;
+
+		image = new BufferedImage(1920, 1080, BufferedImage.TYPE_INT_RGB);
 
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
@@ -147,10 +151,23 @@ public class GUI extends JComponent implements MouseInputListener,
 				}
 
 			}
-		} catch ( RuntimeException e ){
+			generateImage();
+		} catch (RuntimeException e) {
 			System.out.println("Failed to read file " + filename);
 			throw e;
 		}
+	}
+
+	public void generateImage() {
+		Graphics g = image.getGraphics();
+		g.setColor(Color.white);
+		g.fillRect(0, 0, 1920, 1080);
+		this.paint(g);
+
+	}
+
+	public void drawAt(Graphics g, int x, int y, int width, int height) {
+		g.drawImage(image, x, y, width, height, null);
 	}
 
 	public String randType() {
@@ -646,12 +663,12 @@ public class GUI extends JComponent implements MouseInputListener,
 		BufferedWriter output = new BufferedWriter(new FileWriter("output.csv"));
 		SpriteLibrary sprites = new SpriteLibrary();
 		final PSMoveClient client = new PSMoveClient();
-//		try {
-//			client.connect("130.195.11.193", 7899);
-//			client.delayChange(2);
-//		} catch (IOException e) {
-//			System.err.println("Connection to PSMove server failed");
-//		}
+		// try {
+		// client.connect("130.195.11.193", 7899);
+		// client.delayChange(2);
+		// } catch (IOException e) {
+		// System.err.println("Connection to PSMove server failed");
+		// }
 
 		Changer c = new Changer(frame, client);
 
