@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.event.MouseInputListener;
 
@@ -30,8 +29,7 @@ import nz.ac.vuw.ecs.moveme.UpdateListener;
 import representation.Node;
 import representation.SpriteLibrary;
 
-public class GUI extends JComponent implements MouseInputListener,
-		UpdateListener {
+public class GUI extends MoveComponent implements MouseInputListener {
 
 	private static final long serialVersionUID = 2173693118914351514L;
 	private static final int INITIAL_CAPACITY = 100;
@@ -48,7 +46,6 @@ public class GUI extends JComponent implements MouseInputListener,
 	private PSMoveClient moveClient;
 	private int mouseX, mouseY;
 	private BufferedWriter out;
-	private String filename;
 	private final Changer changer;
 	private final BufferedImage image;
 
@@ -634,7 +631,7 @@ public class GUI extends JComponent implements MouseInputListener,
 
 	}
 
-	public static final List<GUI> guis = new ArrayList<GUI>();
+	public static final List<MoveComponent> guis = new ArrayList<MoveComponent>();
 	public static int count = 0;
 
 	public static void main(String args[]) throws IOException {
@@ -682,16 +679,35 @@ public class GUI extends JComponent implements MouseInputListener,
 			output.flush();
 			System.out.println("Loading all guis");
 			Scanner scan = new Scanner(new File(args[0]));
+			List<String> files = new ArrayList<String>();
 			while (scan.hasNextLine()) {
 				String file = scan.nextLine();
-				GUI gui = new GUI(sprites, client, output, c);
-				gui.loadGraph(file + (forces ? ".136.rend" : ".410.rend"));
-				guis.add(gui);
+				files.add(file);
+			}
+			List<String> expGraph = files.subList(4, files.size());
+			Collections.shuffle(expGraph);
+			for(String s : files.subList(0,4)){
+				GUI gui1 = new GUI(sprites, client, output, c);
+				gui1.loadGraph(s +".410.rend");
+				guis.add(gui1);
+			}
+			for (String s : expGraph) {
+				GUI gui1 = new GUI(sprites, client, output, c);
+				GUI gui2 = new GUI(sprites, client, output, c);
+
+				boolean firstL = Math.random() < 0.5;
+
+				gui1.loadGraph(s + (firstL ? ".136.rend" : ".410.rend"));
+				gui2.loadGraph(s + (firstL ? ".410.rend" : ".136.rend"));
+				
+				QuestionPane p = new QuestionPane(c,gui1,gui2);
+				guis.add(gui1);
+				guis.add(gui2);
+				guis.add(p);
 			}
 			System.out.println(guis.size() + " GUIS loaded");
 			scan.close();
 		}
-		Collections.shuffle(guis.subList(4, guis.size()));
 		client.registerListener(guis.get(0));
 		frame.getContentPane().add(guis.get(0), BorderLayout.CENTER);
 
@@ -699,19 +715,19 @@ public class GUI extends JComponent implements MouseInputListener,
 			@Override
 			public void keyPressed(KeyEvent arg0) {
 				switch (arg0.getKeyChar()) {
-				case 'r':
-				case 'R':
-					if (guis.size() > 20) {
-						guis.remove(count);
-						if (count == guis.size()) {
-							count -= 2;
-						} else {
-							count--;
-						}
-					} else {
-						System.err.println("Target size of 20 already reached");
-						break;
-					}
+//				case 'r':
+//				case 'R':
+//					if (guis.size() > 20) {
+//						guis.remove(count);
+//						if (count == guis.size()) {
+//							count -= 2;
+//						} else {
+//							count--;
+//						}
+//					} else {
+//						System.err.println("Target size of 20 already reached");
+//						break;
+//					}
 				case 'q':
 				case 'Q':
 					if (count < guis.size() - 1) {
@@ -734,20 +750,20 @@ public class GUI extends JComponent implements MouseInputListener,
 						frame.repaint();
 					}
 					break;
-				case 'c':
-				case 'C':
-					System.out.println("");
-					System.out.println("");
-					System.out.println("");
-					for (GUI s : guis) {
-						System.out.println(s.filename);
-					}
-					break;
-				case 'p':
-				case 'P':
-					String s = guis.get(count).toSVG();
-					System.out.println(s);
-
+//				case 'c':
+//				case 'C':
+//					System.out.println("");
+//					System.out.println("");
+//					System.out.println("");
+//					for (MoveComponent s : guis) {
+//						System.out.println(s.filename);
+//					}
+//					break;
+//				case 'p':
+//				case 'P':
+//					String s = guis.get(count).toSVG();
+//					System.out.println(s);
+//
 				}
 
 			}
