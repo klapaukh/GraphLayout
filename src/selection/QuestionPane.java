@@ -10,6 +10,7 @@ public class QuestionPane extends MoveComponent implements MouseListener {
 	private static final long serialVersionUID = 17834150123L;
 	private static final int textHeight = 60;
 	private static final int partHeight = 1080;
+	private int graphHeight = 10;
 	private int partWidth = 640;
 	private final String[] questions;
 	private final int[] answers;
@@ -27,14 +28,16 @@ public class QuestionPane extends MoveComponent implements MouseListener {
 		this.changer = changer;
 		this.g1 = g1;
 		this.g2 = g2;
+		this.addMouseListener(this);
 	}
 
 	public void paint(Graphics g) {
-		partWidth = this.getWidth() / questions.length;
+		partWidth = 1920 / questions.length;
 
-		int graphHeight = (partHeight - textHeight)/2;
+		graphHeight = (partHeight - textHeight)/2;
 		// TODO: Make the graph the right aspect ratio?
-
+		g.setColor(Color.white);
+		g.fillRect(0,0,getWidth(), textHeight);
 		g.setColor(Color.black);
 
 		// Draw the questions
@@ -48,17 +51,17 @@ public class QuestionPane extends MoveComponent implements MouseListener {
 			g1.drawAt(g, i * partWidth, textHeight, partWidth, graphHeight);
 			g2.drawAt(g, i * partWidth, textHeight + graphHeight, partWidth,
 					graphHeight);
-			if (answers[i] == -1) {
+			if (answers[i] != -1) {
 				g.setColor(shade);
 				g.fillRect(i * partWidth, textHeight + (answers[i] == 1 ? 0
-						: graphHeight), partWidth, partHeight);
+						: graphHeight), partWidth, graphHeight);
 			}
 		}
 		g.setColor(Color.black);
 
 		// Draw Frames
-		g.drawLine(0, textHeight, getWidth(), textHeight);
-		g.drawLine(0, textHeight + graphHeight, getWidth(), textHeight
+		g.drawLine(0, textHeight, 1920, textHeight);
+		g.drawLine(0, textHeight + graphHeight, 1920, textHeight
 				+ graphHeight);
 		for (int i = 0; i < questions.length; i++) {
 			g.drawRect(i * partWidth, 0, partWidth, partHeight);
@@ -70,7 +73,7 @@ public class QuestionPane extends MoveComponent implements MouseListener {
 			return;
 		}
 		int graph;
-		if (y > textHeight && y < textHeight + partHeight) {
+		if (y > textHeight && y < textHeight + graphHeight) {
 			// Graph 1 selected
 			graph = 1;
 		} else {
@@ -83,6 +86,7 @@ public class QuestionPane extends MoveComponent implements MouseListener {
 				// this is the question that has been answered
 				answers[i] = graph;
 				checkFinished();
+				this.repaint();
 				return;
 			}
 		}
