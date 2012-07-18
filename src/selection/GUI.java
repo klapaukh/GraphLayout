@@ -148,10 +148,12 @@ public class GUI extends MoveComponent implements MouseInputListener {
 				}
 
 			}
-			generateImage();
+
 		} catch (RuntimeException e) {
 			System.out.println("Failed to read file " + filename);
 			throw e;
+		}finally{
+			generateImage();
 		}
 	}
 
@@ -707,6 +709,7 @@ public class GUI extends MoveComponent implements MouseInputListener {
 			}
 			System.out.println(guis.size() + " GUIS loaded");
 			scan.close();
+			guis.add(new FinalScreen());
 		}
 		client.registerListener(guis.get(0));
 		frame.getContentPane().add(guis.get(0), BorderLayout.CENTER);
