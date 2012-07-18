@@ -141,7 +141,7 @@ public class GUI extends JComponent implements MouseInputListener, UpdateListene
 				}
 
 			}
-		} catch ( Exception e ){
+		} catch ( RuntimeException e ){
 			System.out.println("Failed to read file " + filename);
 			throw e;
 		}
