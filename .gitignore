@@ -1,5 +1,4 @@
 bin/
-*.txt
 examples/
 tests/
 .pydevproject
