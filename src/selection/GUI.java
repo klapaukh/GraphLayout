@@ -3,6 +3,7 @@ package selection;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Toolkit;
@@ -48,6 +49,7 @@ public class GUI extends MoveComponent implements MouseInputListener {
 	private BufferedWriter out;
 	private final Changer changer;
 	private final BufferedImage image;
+	private Font font;
 
 	public static final String SQUARE = "#";
 	public static final String TRIANGLE = "V";
@@ -75,6 +77,8 @@ public class GUI extends MoveComponent implements MouseInputListener {
 		mouseX = mouseY = -100;
 		this.changer = c;
 
+		this.font = new Font("Arial",Font.PLAIN,12);
+		
 		selecting = false;
 		deselecting = false;
 		selected = null;
@@ -194,6 +198,7 @@ public class GUI extends MoveComponent implements MouseInputListener {
 	}
 
 	public void paint(Graphics g) {
+		g.setFont(font);
 		g.setColor(Color.white);
 		g.fillRect(0, 0, getWidth(), getHeight());
 
