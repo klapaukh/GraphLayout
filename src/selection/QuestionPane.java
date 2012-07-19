@@ -19,9 +19,10 @@ public class QuestionPane extends MoveComponent implements MouseListener {
 	private final GUI g1, g2;
 	private final Changer changer;
 	private final BufferedWriter out;
+	private int mouseX, mouseY;
 
 	public QuestionPane(Changer changer, GUI g1, GUI g2, BufferedWriter out) {
-		this.questions = new String[] { "Which graph layout was better?",
+		this.questions = new String[] { "Which were more accurate on?",
 				"Which did you perform faster on?", "Which did you prefer?" };
 		this.answers = new int[questions.length];
 		for (int i = 0; i < answers.length; i++) {
@@ -30,8 +31,11 @@ public class QuestionPane extends MoveComponent implements MouseListener {
 		this.changer = changer;
 		this.g1 = g1;
 		this.g2 = g2;
+		this.mouseX = 0;
+		this.mouseY = 0;
 		this.addMouseListener(this);
 		this.out = out;
+		this.filename = "QSPANE";
 	}
 
 	public void paint(Graphics g) {
@@ -69,6 +73,9 @@ public class QuestionPane extends MoveComponent implements MouseListener {
 		for (int i = 0; i < questions.length; i++) {
 			g.drawRect(i * partWidth, 0, partWidth, partHeight);
 		}
+
+		g.setColor(Color.GREEN);
+		g.fillOval(mouseX - 10, mouseY - 10, 20, 20);
 	}
 
 	private void select(int x, int y) {
@@ -102,11 +109,13 @@ public class QuestionPane extends MoveComponent implements MouseListener {
 		}
 		if (finished) {
 			try {
-				out.write("Questions,");
-				for (int i = 0; i < answers.length; i++) {
-					out.write(answers[i]);
+				synchronized (out) {
+					out.write("Questions,");
+					for (int i = 0; i < answers.length; i++) {
+						out.write(answers[i]);
+					}
+					out.flush();
 				}
-				out.flush();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -123,9 +132,14 @@ public class QuestionPane extends MoveComponent implements MouseListener {
 	@Override
 	public void positionUpdate(float x, float y, int buttonsPushed,
 			int buttonsHeld, int buttonsReleased, int trigger) {
+		int normX = (int) (getWidth() * (x + 0.5));
+		int normY = (int) -(getHeight() * (y - 0.5));
+		mouseX = normX;
+		mouseY = normY;
 		if (trigger > 100) {
-			this.select((int) x, (int) y);
+			this.select(mouseX, mouseY);
 		}
+		this.repaint();
 	}
 
 	@Override
