@@ -1,27 +1,32 @@
 package selection;
 
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.geom.Rectangle2D;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
 public class QuestionPane extends MoveComponent implements MouseListener {
 
 	private static final long serialVersionUID = 17834150123L;
-	private static final int textHeight = 60;
-	private static final int partHeight = 1080;
+	private static int textHeight = 60;
+	private static int partHeight = 1080;
 	private int graphHeight = 10;
-	private int partWidth = 640;
+	private int partWidth = 960;
 	private final String[] questions;
 	private final int[] answers;
 	private final GUI g1, g2;
 	private final Changer changer;
 	private final BufferedWriter out;
+	private int mouseX, mouseY;
+	private Font font;
 
 	public QuestionPane(Changer changer, GUI g1, GUI g2, BufferedWriter out) {
-		this.questions = new String[] { "Which graph layout was better?",
+		this.questions = new String[] { "Which were you more accurate on?",
 				"Which did you perform faster on?", "Which did you prefer?" };
 		this.answers = new int[questions.length];
 		for (int i = 0; i < answers.length; i++) {
@@ -30,53 +35,68 @@ public class QuestionPane extends MoveComponent implements MouseListener {
 		this.changer = changer;
 		this.g1 = g1;
 		this.g2 = g2;
+		this.mouseX = 0;
+		this.mouseY = 0;
 		this.addMouseListener(this);
 		this.out = out;
+		this.filename = "QSPANE";
+		this.font = new Font("serif", Font.PLAIN, 40);
 	}
 
 	public void paint(Graphics g) {
-		partWidth = 1920 / questions.length;
+		partWidth = getWidth() / 2;
+		partHeight = getHeight();
+		graphHeight = partHeight / 2;
+		textHeight = graphHeight / questions.length;
 
-		graphHeight = (partHeight - textHeight) / 2;
-		// TODO: Make the graph the right aspect ratio?
+		// Draw a background
 		g.setColor(Color.white);
-		g.fillRect(0, 0, getWidth(), textHeight);
-		g.setColor(Color.black);
-
-		// Draw the questions
-		for (int i = 0; i < questions.length; i++) {
-			g.drawString(questions[i], i * partWidth, 40);
-		}
+		g.fillRect(0, 0, getWidth(), getHeight());
 
 		// Draw the graphs
-		Color shade = new Color(1.0f, 1.0f, 0f, 0.5f);
-		for (int i = 0; i < questions.length; i++) {
-			g1.drawAt(g, i * partWidth, textHeight, partWidth, graphHeight);
-			g2.drawAt(g, i * partWidth, textHeight + graphHeight, partWidth,
-					graphHeight);
-			if (answers[i] != -1) {
-				g.setColor(shade);
-				g.fillRect(i * partWidth, textHeight
-						+ (answers[i] == 1 ? 0 : graphHeight), partWidth,
-						graphHeight);
-			}
-		}
+		g1.drawAt(g, 0, 0, partWidth, graphHeight);
+		g2.drawAt(g, partWidth, 0, partWidth, graphHeight);
+
 		g.setColor(Color.black);
+		g.setFont(font);
+		// Draw the questions
+		for (int i = 0; i < questions.length; i++) {
+			FontMetrics m = g.getFontMetrics();
+			Rectangle2D rect = m.getStringBounds(questions[i], g);
+			
+			g.drawString(questions[i], (int) (partWidth - rect.getWidth()/2), (int) (graphHeight + i * textHeight +textHeight/2 - rect.getHeight()/2));
+		}
+
+		g.setColor(Color.gray);
 
 		// Draw Frames
-		g.drawLine(0, textHeight, 1920, textHeight);
-		g.drawLine(0, textHeight + graphHeight, 1920, textHeight + graphHeight);
+		g.drawLine(partWidth, 0, partWidth, partHeight);
 		for (int i = 0; i < questions.length; i++) {
-			g.drawRect(i * partWidth, 0, partWidth, partHeight);
+			int y = graphHeight + i * textHeight;
+			g.drawRect(0, y, getWidth(), y);
 		}
+
+		Color shade = new Color(1.0f, 1.0f, 0f, 0.5f);
+		for (int i = 0; i < questions.length; i++) {
+
+			if (answers[i] != -1) {
+				g.setColor(shade);
+				g.fillRect((answers[i] - 1) * partWidth, i * textHeight
+						+ graphHeight, partWidth, textHeight);
+			}
+		}
+
+		g.setColor(Color.GREEN);
+		g.fillOval(mouseX - 10, mouseY - 10, 20, 20);
 	}
 
 	private void select(int x, int y) {
-		if (y < textHeight) {
+		if (y < graphHeight) {
+			//Missed the questions
 			return;
 		}
 		int graph;
-		if (y > textHeight && y < textHeight + graphHeight) {
+		if (x < partWidth) {
 			// Graph 1 selected
 			graph = 1;
 		} else {
@@ -85,7 +105,7 @@ public class QuestionPane extends MoveComponent implements MouseListener {
 		}
 
 		for (int i = 0; i < questions.length; i++) {
-			if (x <= (i + 1) * partWidth) {
+			if (y <= (i + 1) * textHeight + graphHeight) {
 				// this is the question that has been answered
 				answers[i] = graph;
 				checkFinished();
@@ -102,11 +122,13 @@ public class QuestionPane extends MoveComponent implements MouseListener {
 		}
 		if (finished) {
 			try {
-				out.write("Questions,");
-				for (int i = 0; i < answers.length; i++) {
-					out.write(answers[i]);
+				synchronized (out) {
+					out.write("Questions,");
+					for (int i = 0; i < answers.length; i++) {
+						out.write(answers[i]);
+					}
+					out.flush();
 				}
-				out.flush();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -123,9 +145,14 @@ public class QuestionPane extends MoveComponent implements MouseListener {
 	@Override
 	public void positionUpdate(float x, float y, int buttonsPushed,
 			int buttonsHeld, int buttonsReleased, int trigger) {
+		int normX = (int) (getWidth() * (x + 0.5));
+		int normY = (int) -(getHeight() * (y - 0.5));
+		mouseX = normX;
+		mouseY = normY;
 		if (trigger > 100) {
-			this.select((int) x, (int) y);
+			this.select(mouseX, mouseY);
 		}
+		this.repaint();
 	}
 
 	@Override
@@ -135,9 +162,6 @@ public class QuestionPane extends MoveComponent implements MouseListener {
 
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
-		if (arg0.getButton() == MouseEvent.BUTTON1) {
-			this.select(arg0.getX(), arg0.getY());
-		}
 	}
 
 	@Override
@@ -154,6 +178,9 @@ public class QuestionPane extends MoveComponent implements MouseListener {
 
 	@Override
 	public void mouseReleased(MouseEvent arg0) {
+		if (arg0.getButton() == MouseEvent.BUTTON1) {
+			this.select(arg0.getX(), arg0.getY());
+		}
 	}
 
 }

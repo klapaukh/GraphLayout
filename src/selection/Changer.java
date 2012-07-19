@@ -18,8 +18,9 @@ public class Changer {
 	public void next() {
 		if (GUI.count < GUI.guis.size() - 1) {
 			frame.getContentPane().removeAll();
-			frame.getContentPane().add(GUI.guis.get(++GUI.count), BorderLayout.CENTER);
+			GUI.count++;
 			client.registerListener(GUI.guis.get(GUI.count));
+			frame.getContentPane().add(GUI.guis.get(GUI.count), BorderLayout.CENTER);
 			frame.validate();
 			frame.repaint();
 		}
