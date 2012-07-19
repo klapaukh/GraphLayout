@@ -62,7 +62,6 @@ public class GUI extends MoveComponent implements MouseInputListener {
 			throws IOException {
 		moveClient = m;
 		this.out = out;
-		moveClient.registerListener(this);
 		nodes = new ArrayList<Node>();
 		selectedThisRound = new ArrayList<Node>();
 		points = new double[INITIAL_CAPACITY][2];
@@ -648,16 +647,6 @@ public class GUI extends MoveComponent implements MouseInputListener {
 		frame.setUndecorated(true);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new BorderLayout());
-
-		// AsynchronousFileChannel output;
-		// try{
-		// output = AsynchronousFileChannel.open((new
-		// File("output.data")).toPath(), StandardOpenOption.READ);
-		// }catch (IOException e){
-		// e.printStackTrace();
-		// }catch(SecurityException e){
-		// e.printStackTrace();
-		// }
 
 		BufferedWriter output = new BufferedWriter(new FileWriter("output.csv"));
 		SpriteLibrary sprites = new SpriteLibrary();
