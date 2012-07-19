@@ -77,8 +77,8 @@ public class GUI extends MoveComponent implements MouseInputListener {
 		mouseX = mouseY = -100;
 		this.changer = c;
 
-		this.font = new Font("Arial",Font.PLAIN,12);
-		
+		this.font = new Font("Arial", Font.PLAIN, 12);
+
 		selecting = false;
 		deselecting = false;
 		selected = null;
@@ -155,7 +155,7 @@ public class GUI extends MoveComponent implements MouseInputListener {
 		} catch (RuntimeException e) {
 			System.out.println("Failed to read file " + filename);
 			throw e;
-		}finally{
+		} finally {
 			generateImage();
 		}
 	}
@@ -656,12 +656,12 @@ public class GUI extends MoveComponent implements MouseInputListener {
 		BufferedWriter output = new BufferedWriter(new FileWriter("output.csv"));
 		SpriteLibrary sprites = new SpriteLibrary();
 		final PSMoveClient client = new PSMoveClient();
-		 try {
-		 client.connect("130.195.11.193", 7899);
-		 client.delayChange(2);
-		 } catch (IOException e) {
-		 System.err.println("Connection to PSMove server failed");
-		 }
+//		try {
+//			client.connect("130.195.11.193", 7899);
+//			client.delayChange(2);
+//		} catch (IOException e) {
+//			System.err.println("Connection to PSMove server failed");
+//		}
 
 		Changer c = new Changer(frame, client);
 
@@ -680,11 +680,11 @@ public class GUI extends MoveComponent implements MouseInputListener {
 				String file = scan.nextLine();
 				files.add(file);
 			}
-			List<String> expGraph = files.subList(4 , files.size());
+			List<String> expGraph = files.subList(4, files.size());
 			Collections.shuffle(expGraph);
-			for(String s : files.subList(0,4)){
+			for (String s : files.subList(0, 4)) {
 				GUI gui1 = new GUI(sprites, client, output, c);
-				gui1.loadGraph(s +".410.rend");
+				gui1.loadGraph(s + ".410.rend");
 				guis.add(gui1);
 			}
 			for (String s : expGraph) {
@@ -695,8 +695,8 @@ public class GUI extends MoveComponent implements MouseInputListener {
 
 				gui1.loadGraph(s + (firstL ? ".136.rend" : ".410.rend"));
 				gui2.loadGraph(s + (firstL ? ".410.rend" : ".136.rend"));
-				
-				QuestionPane p = new QuestionPane(c,gui1,gui2,output);
+
+				QuestionPane p = new QuestionPane(c, gui1, gui2, output);
 				guis.add(gui1);
 				guis.add(gui2);
 				guis.add(p);
@@ -712,19 +712,6 @@ public class GUI extends MoveComponent implements MouseInputListener {
 			@Override
 			public void keyPressed(KeyEvent arg0) {
 				switch (arg0.getKeyChar()) {
-//				case 'r':
-//				case 'R':
-//					if (guis.size() > 20) {
-//						guis.remove(count);
-//						if (count == guis.size()) {
-//							count -= 2;
-//						} else {
-//							count--;
-//						}
-//					} else {
-//						System.err.println("Target size of 20 already reached");
-//						break;
-//					}
 				case 'q':
 				case 'Q':
 					if (count < guis.size() - 1) {
@@ -747,22 +734,7 @@ public class GUI extends MoveComponent implements MouseInputListener {
 						frame.repaint();
 					}
 					break;
-//				case 'c':
-//				case 'C':
-//					System.out.println("");
-//					System.out.println("");
-//					System.out.println("");
-//					for (MoveComponent s : guis) {
-//						System.out.println(s.filename);
-//					}
-//					break;
-//				case 'p':
-//				case 'P':
-//					String s = guis.get(count).toSVG();
-//					System.out.println(s);
-//
 				}
-
 			}
 
 			@Override
