@@ -662,12 +662,12 @@ public class GUI extends MoveComponent implements MouseInputListener {
 		BufferedWriter output = new BufferedWriter(new FileWriter("output.csv"));
 		SpriteLibrary sprites = new SpriteLibrary();
 		final PSMoveClient client = new PSMoveClient();
-		// try {
-		// client.connect("130.195.11.193", 7899);
-		// client.delayChange(2);
-		// } catch (IOException e) {
-		// System.err.println("Connection to PSMove server failed");
-		// }
+		 try {
+		 client.connect("130.195.11.193", 7899);
+		 client.delayChange(2);
+		 } catch (IOException e) {
+		 System.err.println("Connection to PSMove server failed");
+		 }
 
 		Changer c = new Changer(frame, client);
 
@@ -686,7 +686,7 @@ public class GUI extends MoveComponent implements MouseInputListener {
 				String file = scan.nextLine();
 				files.add(file);
 			}
-			List<String> expGraph = files.subList(4, files.size());
+			List<String> expGraph = files.subList(4 , files.size());
 			Collections.shuffle(expGraph);
 			for(String s : files.subList(0,4)){
 				GUI gui1 = new GUI(sprites, client, output, c);
