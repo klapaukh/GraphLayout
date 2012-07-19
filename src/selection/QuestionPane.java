@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.BufferedWriter;
+import java.io.IOException;
 
 public class QuestionPane extends MoveComponent implements MouseListener {
 
@@ -16,11 +18,11 @@ public class QuestionPane extends MoveComponent implements MouseListener {
 	private final int[] answers;
 	private final GUI g1, g2;
 	private final Changer changer;
+	private final BufferedWriter out;
 
-	public QuestionPane(Changer changer, GUI g1, GUI g2) {
+	public QuestionPane(Changer changer, GUI g1, GUI g2, BufferedWriter out) {
 		this.questions = new String[] { "Which graph layout was better?",
-				"Which did you perform faster on?",
-				"Which did you prefer?"};
+				"Which did you perform faster on?", "Which did you prefer?" };
 		this.answers = new int[questions.length];
 		for (int i = 0; i < answers.length; i++) {
 			answers[i] = -1;
@@ -29,15 +31,16 @@ public class QuestionPane extends MoveComponent implements MouseListener {
 		this.g1 = g1;
 		this.g2 = g2;
 		this.addMouseListener(this);
+		this.out = out;
 	}
 
 	public void paint(Graphics g) {
 		partWidth = 1920 / questions.length;
 
-		graphHeight = (partHeight - textHeight)/2;
+		graphHeight = (partHeight - textHeight) / 2;
 		// TODO: Make the graph the right aspect ratio?
 		g.setColor(Color.white);
-		g.fillRect(0,0,getWidth(), textHeight);
+		g.fillRect(0, 0, getWidth(), textHeight);
 		g.setColor(Color.black);
 
 		// Draw the questions
@@ -53,16 +56,16 @@ public class QuestionPane extends MoveComponent implements MouseListener {
 					graphHeight);
 			if (answers[i] != -1) {
 				g.setColor(shade);
-				g.fillRect(i * partWidth, textHeight + (answers[i] == 1 ? 0
-						: graphHeight), partWidth, graphHeight);
+				g.fillRect(i * partWidth, textHeight
+						+ (answers[i] == 1 ? 0 : graphHeight), partWidth,
+						graphHeight);
 			}
 		}
 		g.setColor(Color.black);
 
 		// Draw Frames
 		g.drawLine(0, textHeight, 1920, textHeight);
-		g.drawLine(0, textHeight + graphHeight, 1920, textHeight
-				+ graphHeight);
+		g.drawLine(0, textHeight + graphHeight, 1920, textHeight + graphHeight);
 		for (int i = 0; i < questions.length; i++) {
 			g.drawRect(i * partWidth, 0, partWidth, partHeight);
 		}
@@ -98,6 +101,15 @@ public class QuestionPane extends MoveComponent implements MouseListener {
 			finished = finished && answers[i] != -1;
 		}
 		if (finished) {
+			try {
+				out.write("Questions,");
+				for (int i = 0; i < answers.length; i++) {
+					out.write(answers[i]);
+				}
+				out.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			this.changer.next();
 		}
 	}

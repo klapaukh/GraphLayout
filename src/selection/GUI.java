@@ -702,7 +702,7 @@ public class GUI extends MoveComponent implements MouseInputListener {
 				gui1.loadGraph(s + (firstL ? ".136.rend" : ".410.rend"));
 				gui2.loadGraph(s + (firstL ? ".410.rend" : ".136.rend"));
 				
-				QuestionPane p = new QuestionPane(c,gui1,gui2);
+				QuestionPane p = new QuestionPane(c,gui1,gui2,output);
 				guis.add(gui1);
 				guis.add(gui2);
 				guis.add(p);
