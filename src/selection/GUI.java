@@ -32,36 +32,35 @@ import representation.SpriteLibrary;
 
 public class GUI extends MoveComponent implements MouseInputListener {
 
-	private static final long serialVersionUID = 2173693118914351514L;
-	private static final int INITIAL_CAPACITY = 100;
-	private List<Node> nodes;
-	private double[][] points;
-	private boolean selecting, deselecting;
-	private Node selected;
-	public List<Integer> start, end;
-	public List<String> label;
-	private SpriteLibrary sprites;
-	private int[] pointsDrawX, pointsDrawY;
-	private int size;
-	private List<Node> selectedThisRound;
-	private PSMoveClient moveClient;
-	private int mouseX, mouseY;
-	private BufferedWriter out;
-	private final Changer changer;
-	private final BufferedImage image;
-	private Font font;
+	private static final long	serialVersionUID	= 2173693118914351514L;
+	private static final int	INITIAL_CAPACITY	= 100;
+	private List<Node>			nodes;
+	private double[][]			points;
+	private boolean				selecting, deselecting;
+	private Node				selected;
+	public List<Integer>		start, end;
+	public List<String>			label;
+	private SpriteLibrary		sprites;
+	private int[]				pointsDrawX, pointsDrawY;
+	private int					size;
+	private List<Node>			selectedThisRound;
+	private PSMoveClient		moveClient;
+	private int					mouseX, mouseY;
+	private BufferedWriter		out;
+	private final Changer		changer;
+	private final BufferedImage	image;
+	private Font				font;
 
-	public static final String SQUARE = "#";
-	public static final String TRIANGLE = "V";
-	public static final String CIRCLE = "O";
-	public static final String CROSS = "X";
-	public static final String MOVE = "M";
-	public static final String SELECT = "E";
-	public static final String START = "S";
-	public static final String TRIGGER = "T";
+	public static final String	SQUARE				= "#";
+	public static final String	TRIANGLE			= "V";
+	public static final String	CIRCLE				= "O";
+	public static final String	CROSS				= "X";
+	public static final String	MOVE				= "M";
+	public static final String	SELECT				= "E";
+	public static final String	START				= "S";
+	public static final String	TRIGGER				= "T";
 
-	public GUI(SpriteLibrary s, PSMoveClient m, BufferedWriter out, Changer c)
-			throws IOException {
+	public GUI(SpriteLibrary s, PSMoveClient m, BufferedWriter out, Changer c) throws IOException {
 		moveClient = m;
 		this.out = out;
 		nodes = new ArrayList<Node>();
@@ -113,16 +112,14 @@ public class GUI extends MoveComponent implements MouseInputListener {
 					int y = Integer.parseInt(props[3]);
 					int width = Integer.parseInt(props[4]);
 					int height = Integer.parseInt(props[5]);
-					nodes.add(new Node(x, y, width, height, label, type,
-							sprites, 1, 1));
+					nodes.add(new Node(x, y, width, height, label, type, sprites, 1, 1));
 
 					for (int i = 6; i < props.length; i += 2) {
 						int end = Integer.parseInt(props[i]);
 						if (nodes.size() - 1 <= end) {
 							start.add(nodes.size() - 1);
 							this.end.add(end);
-							this.label.add(props.length <= i + 1 ? ""
-									: props[i + 1]);
+							this.label.add(props.length <= i + 1 ? "" : props[i + 1]);
 						}
 					}
 
@@ -134,10 +131,8 @@ public class GUI extends MoveComponent implements MouseInputListener {
 			System.out.println("Generating Random Graph");
 			int numNodes = (int) (Math.random() * 30 + 10);
 			for (int i = 0; i < numNodes; i++) {
-				nodes.add(new Node((int) (Math.random() * 800), (int) (Math
-						.random() * 800), (int) (Math.random() * 40 + 10),
-						(int) (Math.random() * 40 + 10), randString(5),
-						randType(), sprites, 1, 1));
+				nodes.add(new Node((int) (Math.random() * 800), (int) (Math.random() * 800), (int) (Math.random() * 40 + 10),
+						(int) (Math.random() * 40 + 10), randString(5), randType(), sprites, 1, 1));
 			}
 
 			int numEdges = (int) (Math.random() * numNodes / 2 + numNodes / 2);
@@ -240,15 +235,13 @@ public class GUI extends MoveComponent implements MouseInputListener {
 		if (selecting || deselecting) {
 			if (e.getButton() == MouseEvent.BUTTON2) {
 				if (selectedThisRound.size() > 0)
-					selectedThisRound.get(selectedThisRound.size() - 1)
-							.toggleSelected();
+					selectedThisRound.get(selectedThisRound.size() - 1).toggleSelected();
 			} else {
 				if (size > 0)
 					size--;
 				for (Node n : nodes) {
 					boolean thisRound = selectedThisRound.contains(n);
-					if (!thisRound && deselecting == n.selected()
-							&& n.inside(points, size)) {
+					if (!thisRound && deselecting == n.selected() && n.inside(points, size)) {
 						if (!selectedThisRound.contains(n)) {
 							n.setSelected(selecting);
 							selectedThisRound.add(n);
@@ -283,12 +276,10 @@ public class GUI extends MoveComponent implements MouseInputListener {
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		if ((selecting && e.getButton() == MouseEvent.BUTTON1)
-				|| (deselecting && e.getButton() == MouseEvent.BUTTON3)) {
+		if ((selecting && e.getButton() == MouseEvent.BUTTON1) || (deselecting && e.getButton() == MouseEvent.BUTTON3)) {
 			for (Node n : nodes) {
 				boolean thisRound = selectedThisRound.contains(n);
-				if (!thisRound && deselecting == n.selected()
-						&& n.inside(points, size)) {
+				if (!thisRound && deselecting == n.selected() && n.inside(points, size)) {
 					if (!selectedThisRound.contains(n)) {
 						n.setSelected(selecting);
 					}
@@ -329,8 +320,7 @@ public class GUI extends MoveComponent implements MouseInputListener {
 
 			for (Node n : nodes) {
 				boolean thisRound = selectedThisRound.contains(n);
-				if (!thisRound && deselecting == n.selected()
-						&& n.inside(points, size)) {
+				if (!thisRound && deselecting == n.selected() && n.inside(points, size)) {
 					if (!selectedThisRound.contains(n)) {
 						n.setSelected(selecting);
 						selectedThisRound.add(n);
@@ -369,8 +359,7 @@ public class GUI extends MoveComponent implements MouseInputListener {
 	}
 
 	@Override
-	public void positionUpdate(int buttonsPushed, int buttonsHeld,
-			int buttonsReleased, int trigger) {
+	public void positionUpdate(int buttonsPushed, int buttonsHeld, int buttonsReleased, int trigger) {
 		synchronized (out) {
 			try {
 				if ((buttonsPushed & UpdateListener.ButtonCircle) != 0) {
@@ -403,8 +392,7 @@ public class GUI extends MoveComponent implements MouseInputListener {
 				}
 				if (trigger > 100) {
 					out.write(TRIGGER);
-					moveClient.setTrackingColor(PSMoveClient.PICK_FOR_ME,
-							PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME,
+					moveClient.setTrackingColor(PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME,
 							PSMoveClient.PICK_FOR_ME);
 				}
 				if (buttonsPushed != 0) {
@@ -424,7 +412,7 @@ public class GUI extends MoveComponent implements MouseInputListener {
 
 	}
 
-	int triggerLast = 0;
+	int	triggerLast	= 0;
 
 	public String buttonString(int buttonMask) {
 		StringBuilder ss = new StringBuilder();
@@ -453,8 +441,7 @@ public class GUI extends MoveComponent implements MouseInputListener {
 	}
 
 	@Override
-	public void positionUpdate(float x, float y, int buttonsPushed,
-			int buttonsHeld, int buttonsReleased, int trigger) {
+	public void positionUpdate(float x, float y, int buttonsPushed, int buttonsHeld, int buttonsReleased, int trigger) {
 		int normX = (int) (getWidth() * (x + 0.5));
 		int normY = (int) -(getHeight() * (y - 0.5));
 		mouseX = normX;
@@ -503,8 +490,7 @@ public class GUI extends MoveComponent implements MouseInputListener {
 					}
 				}
 				if ((buttonsPushed & UpdateListener.ButtonTriangle) != 0) {
-					moveClient.setTrackingColor(PSMoveClient.PICK_FOR_ME,
-							PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME,
+					moveClient.setTrackingColor(PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME,
 							PSMoveClient.PICK_FOR_ME);
 				}
 				if ((buttonsPushed & UpdateListener.ButtonSquare) != 0) {
@@ -513,8 +499,7 @@ public class GUI extends MoveComponent implements MouseInputListener {
 				if ((buttonsPushed & UpdateListener.ButtonMove) != 0) {
 					// right click from before
 					if (selecting && !selectedThisRound.isEmpty()) {
-						selectedThisRound.get(selectedThisRound.size() - 1)
-								.toggleSelected();
+						selectedThisRound.get(selectedThisRound.size() - 1).toggleSelected();
 					} else if (!selecting) {
 						deselecting = true;
 						ensureCapacity();
@@ -545,10 +530,8 @@ public class GUI extends MoveComponent implements MouseInputListener {
 				}
 				if (trigger > 0) {
 					// Trigger is down - like mouse button
-					if (triggerLast == 0 && deselecting
-							&& !selectedThisRound.isEmpty()) {
-						selectedThisRound.get(selectedThisRound.size() - 1)
-								.toggleSelected();
+					if (triggerLast == 0 && deselecting && !selectedThisRound.isEmpty()) {
+						selectedThisRound.get(selectedThisRound.size() - 1).toggleSelected();
 					} else if (!deselecting) {
 						selecting = true;
 						ensureCapacity();
@@ -562,13 +545,10 @@ public class GUI extends MoveComponent implements MouseInputListener {
 					}
 
 				}
-				if (selecting
-						&& (trigger < 100)
-						|| (deselecting && (buttonsReleased & UpdateListener.ButtonMove) != 0)) {
+				if (selecting && (trigger < 100) || (deselecting && (buttonsReleased & UpdateListener.ButtonMove) != 0)) {
 					for (Node n : nodes) {
 						boolean thisRound = selectedThisRound.contains(n);
-						if (!thisRound && deselecting == n.selected()
-								&& n.inside(points, size)) {
+						if (!thisRound && deselecting == n.selected() && n.inside(points, size)) {
 							if (!selectedThisRound.contains(n)) {
 								n.setSelected(selecting);
 							}
@@ -606,8 +586,7 @@ public class GUI extends MoveComponent implements MouseInputListener {
 	private void updateSelectedNodes() {
 		for (Node n : nodes) {
 			boolean thisRound = selectedThisRound.contains(n);
-			if (!thisRound && deselecting == n.selected()
-					&& n.inside(points, size)) {
+			if (!thisRound && deselecting == n.selected() && n.inside(points, size)) {
 				if (!selectedThisRound.contains(n)) {
 					n.setSelected(selecting);
 					selectedThisRound.add(n);
@@ -637,8 +616,8 @@ public class GUI extends MoveComponent implements MouseInputListener {
 
 	}
 
-	public static final List<MoveComponent> guis = new ArrayList<MoveComponent>();
-	public static int count = 0;
+	public static final List<MoveComponent>	guis	= new ArrayList<MoveComponent>();
+	public static int						count	= 0;
 
 	public static void main(String args[]) throws IOException {
 		if (args.length != 1) {
@@ -656,12 +635,12 @@ public class GUI extends MoveComponent implements MouseInputListener {
 		BufferedWriter output = new BufferedWriter(new FileWriter("output.csv"));
 		SpriteLibrary sprites = new SpriteLibrary();
 		final PSMoveClient client = new PSMoveClient();
-//		try {
-//			client.connect("130.195.11.193", 7899);
-//			client.delayChange(2);
-//		} catch (IOException e) {
-//			System.err.println("Connection to PSMove server failed");
-//		}
+		// try {
+		// client.connect("130.195.11.193", 7899);
+		// client.delayChange(2);
+		// } catch (IOException e) {
+		// System.err.println("Connection to PSMove server failed");
+		// }
 
 		Changer c = new Changer(frame, client);
 
@@ -716,8 +695,7 @@ public class GUI extends MoveComponent implements MouseInputListener {
 				case 'Q':
 					if (count < guis.size() - 1) {
 						frame.getContentPane().removeAll();
-						frame.getContentPane().add(guis.get(++count),
-								BorderLayout.CENTER);
+						frame.getContentPane().add(guis.get(++count), BorderLayout.CENTER);
 						client.registerListener(guis.get(count));
 						frame.validate();
 						frame.repaint();
@@ -727,8 +705,7 @@ public class GUI extends MoveComponent implements MouseInputListener {
 				case 'W':
 					if (count > 0) {
 						frame.getContentPane().removeAll();
-						frame.getContentPane().add(guis.get(--count),
-								BorderLayout.CENTER);
+						frame.getContentPane().add(guis.get(--count), BorderLayout.CENTER);
 						client.registerListener(guis.get(count));
 						frame.validate();
 						frame.repaint();

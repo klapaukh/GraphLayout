@@ -10,24 +10,25 @@ import java.awt.geom.Rectangle2D;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import nz.ac.vuw.ecs.moveme.UpdateListener;
+
 public class QuestionPane extends MoveComponent implements MouseListener {
 
-	private static final long serialVersionUID = 17834150123L;
-	private static int textHeight = 60;
-	private static int partHeight = 1080;
-	private int graphHeight = 10;
-	private int partWidth = 960;
-	private final String[] questions;
-	private final int[] answers;
-	private final GUI g1, g2;
-	private final Changer changer;
-	private final BufferedWriter out;
-	private int mouseX, mouseY;
-	private Font font;
+	private static final long		serialVersionUID	= 17834150123L;
+	private static int				textHeight			= 60;
+	private static int				partHeight			= 1080;
+	private int						graphHeight			= 10;
+	private int						graphWidth			= 960, textWidth;
+	private final String[]			questions;
+	private final int[]				answers;
+	private final GUI				g1, g2;
+	private final Changer			changer;
+	private final BufferedWriter	out;
+	private int						mouseX, mouseY;
+	private Font					font;
 
 	public QuestionPane(Changer changer, GUI g1, GUI g2, BufferedWriter out) {
-		this.questions = new String[] { "Which were you more accurate on?",
-				"Which did you perform faster on?", "Which did you prefer?" };
+		this.questions = new String[] { "Which were you more accurate on?", "Which did you perform faster on?", "Which did you prefer?" };
 		this.answers = new int[questions.length];
 		for (int i = 0; i < answers.length; i++) {
 			answers[i] = -1;
@@ -44,7 +45,8 @@ public class QuestionPane extends MoveComponent implements MouseListener {
 	}
 
 	public void paint(Graphics g) {
-		partWidth = getWidth() / 2;
+		graphWidth = getWidth() / 2;
+		textWidth = getWidth() / 3;
 		partHeight = getHeight();
 		graphHeight = partHeight / 2;
 		textHeight = graphHeight / questions.length;
@@ -54,8 +56,8 @@ public class QuestionPane extends MoveComponent implements MouseListener {
 		g.fillRect(0, 0, getWidth(), getHeight());
 
 		// Draw the graphs
-		g1.drawAt(g, 0, 0, partWidth, graphHeight);
-		g2.drawAt(g, partWidth, 0, partWidth, graphHeight);
+		g1.drawAt(g, 0, 0, graphWidth, graphHeight);
+		g2.drawAt(g, graphWidth, 0, graphWidth, graphHeight);
 
 		g.setColor(Color.black);
 		g.setFont(font);
@@ -63,27 +65,33 @@ public class QuestionPane extends MoveComponent implements MouseListener {
 		for (int i = 0; i < questions.length; i++) {
 			FontMetrics m = g.getFontMetrics();
 			Rectangle2D rect = m.getStringBounds(questions[i], g);
-			
-			g.drawString(questions[i], (int) (partWidth - rect.getWidth()/2), (int) (graphHeight + i * textHeight +textHeight/2 - rect.getHeight()/2));
+
+			g.drawString(questions[i], (int) (getWidth() / 2 - rect.getWidth() / 2),
+					(int) (graphHeight + i * textHeight + textHeight / 2 - rect.getHeight() / 2));
 		}
 
-		g.setColor(Color.gray);
-
-		// Draw Frames
-		g.drawLine(partWidth, 0, partWidth, partHeight);
-		for (int i = 0; i < questions.length; i++) {
-			int y = graphHeight + i * textHeight;
-			g.drawRect(0, y, getWidth(), y);
-		}
-
-		Color shade = new Color(1.0f, 1.0f, 0f, 0.5f);
+		Color shade = Color.green.brighter();
 		for (int i = 0; i < questions.length; i++) {
 
 			if (answers[i] != -1) {
 				g.setColor(shade);
-				g.fillRect((answers[i] - 1) * partWidth, i * textHeight
-						+ graphHeight, partWidth, textHeight);
+				if (answers[i] == 1 || answers[i] == 3) {
+					g.fillRect(0, i * textHeight + graphHeight, textWidth, textHeight);
+				}
+				if (answers[i] == 2 || answers[i] == 3) {
+					g.fillRect(2 * textWidth, i * textHeight + graphHeight, textWidth, textHeight);
+				}
 			}
+		}
+
+		g.setColor(Color.gray);
+		// Draw Frames
+		g.drawLine(graphWidth, 0, graphWidth, graphHeight);
+		g.drawLine(textWidth, graphHeight, textWidth, getHeight());
+		g.drawLine(2 * textWidth, graphHeight, 2 * textWidth, getHeight());
+		for (int i = 0; i < questions.length; i++) {
+			int y = graphHeight + i * textHeight;
+			g.drawRect(0, y, getWidth(), y);
 		}
 
 		g.setColor(Color.GREEN);
@@ -92,23 +100,33 @@ public class QuestionPane extends MoveComponent implements MouseListener {
 
 	private void select(int x, int y) {
 		if (y < graphHeight) {
-			//Missed the questions
+			// Missed the questions
 			return;
 		}
 		int graph;
-		if (x < partWidth) {
+		if (x < textWidth) {
 			// Graph 1 selected
 			graph = 1;
-		} else {
+		} else if (x > 2 * textWidth) {
 			// Graph 2 selected
 			graph = 2;
+		} else {
+			// Not selecting anything
+			return;
 		}
 
 		for (int i = 0; i < questions.length; i++) {
 			if (y <= (i + 1) * textHeight + graphHeight) {
 				// this is the question that has been answered
-				answers[i] = graph;
-				checkFinished();
+				if (answers[i] == -1) {
+					answers[i] = graph;
+				} else if (answers[i] == graph) {
+					answers[i] = -1;
+				} else if (answers[i] == 3) {
+					answers[i] -= graph;
+				} else {
+					answers[i] = 3;
+				}
 				this.repaint();
 				return;
 			}
@@ -123,8 +141,9 @@ public class QuestionPane extends MoveComponent implements MouseListener {
 		if (finished) {
 			try {
 				synchronized (out) {
-					out.write("Questions,");
+					out.write("Questions");
 					for (int i = 0; i < answers.length; i++) {
+						out.write(',');
 						out.write(answers[i]);
 					}
 					out.flush();
@@ -137,21 +156,25 @@ public class QuestionPane extends MoveComponent implements MouseListener {
 	}
 
 	@Override
-	public void positionUpdate(int buttonsPushed, int buttonsHeld,
-			int buttonsReleased, int trigger) {
+	public void positionUpdate(int buttonsPushed, int buttonsHeld, int buttonsReleased, int trigger) {
 		// Can't do anything with only this information
 	}
 
+	private int	lastTrigger	= 0;
+
 	@Override
-	public void positionUpdate(float x, float y, int buttonsPushed,
-			int buttonsHeld, int buttonsReleased, int trigger) {
+	public void positionUpdate(float x, float y, int buttonsPushed, int buttonsHeld, int buttonsReleased, int trigger) {
 		int normX = (int) (getWidth() * (x + 0.5));
 		int normY = (int) -(getHeight() * (y - 0.5));
 		mouseX = normX;
 		mouseY = normY;
-		if (trigger > 100) {
+		if (trigger > 100 && lastTrigger < 100) {
 			this.select(mouseX, mouseY);
 		}
+		if ((buttonsReleased & UpdateListener.ButtonCross) != 0) {
+			checkFinished();
+		}
+		lastTrigger = trigger;
 		this.repaint();
 	}
 
