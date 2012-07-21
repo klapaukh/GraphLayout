@@ -642,7 +642,7 @@ public class GUI extends MoveComponent implements MouseInputListener {
 		// System.err.println("Connection to PSMove server failed");
 		// }
 
-		Changer c = new Changer(frame, client);
+		Changer c = new Changer(frame, client,output);
 
 		if (args[0].endsWith("dot")) {
 			GUI gui = new GUI(sprites, client, output, c);
