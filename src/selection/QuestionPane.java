@@ -150,6 +150,7 @@ public class QuestionPane extends MoveComponent implements MouseListener {
 						out.write(',');
 						out.write(answers[i]);
 					}
+					out.write('\n');
 					out.flush();
 				}
 			} catch (IOException e) {
