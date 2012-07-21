@@ -142,6 +142,10 @@ public class QuestionPane extends MoveComponent implements MouseListener {
 			try {
 				synchronized (out) {
 					out.write("Questions");
+					out.write(",");
+					out.write(g1.filename);
+					out.write(",");
+					out.write(g2.filename);
 					for (int i = 0; i < answers.length; i++) {
 						out.write(',');
 						out.write(answers[i]);
