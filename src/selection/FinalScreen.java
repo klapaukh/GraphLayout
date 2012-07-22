@@ -12,8 +12,10 @@ public class FinalScreen extends MoveComponent {
 	private Font font;
 	private final String message = "Thank you for participating";
 	
+	
 	public FinalScreen(){
 		this.font = new Font("serif",Font.PLAIN,40);
+		this.filename = "Final Screen";
 	}
 	
 	public void paint(Graphics g){
