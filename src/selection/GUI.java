@@ -363,50 +363,43 @@ public class GUI extends MoveComponent implements MouseInputListener {
 		synchronized (out) {
 			try {
 				if ((buttonsPushed & UpdateListener.ButtonCircle) != 0) {
-					out.write(CIRCLE);
 					moveClient.setLaserRight(0);
 				}
 				if ((buttonsPushed & UpdateListener.ButtonCross) != 0) {
-					out.write(CROSS);
 					moveClient.setLaserBottom(0);
 				}
 				if ((buttonsPushed & UpdateListener.ButtonTriangle) != 0) {
-					out.write(TRIANGLE);
 					moveClient.setLaserTop(0);
 				}
 				if ((buttonsPushed & UpdateListener.ButtonSquare) != 0) {
-					out.write(SQUARE);
 					moveClient.setLaserLeft(0);
 				}
 				if ((buttonsPushed & UpdateListener.ButtonMove) != 0) {
-					out.write(MOVE);
 					moveClient.enableLaser(0);
 				}
 				if ((buttonsPushed & UpdateListener.ButtonSelect) != 0) {
-					out.write(SELECT);
 					moveClient.resetController(0);
 				}
 				if ((buttonsPushed & UpdateListener.ButtonStart) != 0) {
-					out.write("S");
 					moveClient.calibrateController(0);
 				}
 				if (trigger > 100) {
-					out.write(TRIGGER);
 					moveClient.setTrackingColor(PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME,
 							PSMoveClient.PICK_FOR_ME);
 				}
-				if (buttonsPushed != 0) {
-					out.write('\n');
-				}
+				
+				out.write("GUI," + System.currentTimeMillis());
+				out.write("," + guis.get(count).filename);
+				out.write("," + mouseX);
+				out.write("," + mouseY);
+				out.write("," + buttonString(buttonsPushed));
+				out.write("," + buttonString(buttonsHeld));
+				out.write("," + buttonString(buttonsReleased));
+				out.write("," + trigger);
+				out.write('\n');
 				out.flush();
 			} catch (IOException e) {
 				e.printStackTrace();
-				try {
-					out.write('\n');
-					out.flush();
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
 			}
 		}
 
@@ -449,7 +442,7 @@ public class GUI extends MoveComponent implements MouseInputListener {
 
 		synchronized (out) {
 			try {
-				out.write("" + System.currentTimeMillis());
+				out.write("GUI," + System.currentTimeMillis());
 				out.write("," + guis.get(count).filename);
 				out.write("," + mouseX);
 				out.write("," + mouseY);
@@ -605,13 +598,6 @@ public class GUI extends MoveComponent implements MouseInputListener {
 		}
 		if (perfect && changer != null) {
 			this.changer.next();
-			synchronized (out) {
-				out.write("" + System.currentTimeMillis());
-				out.write(",Graph Changed,");
-				out.write(GUI.guis.get(count).filename);
-				out.write("\n");
-				out.flush();
-			}
 		}
 
 	}
@@ -635,12 +621,12 @@ public class GUI extends MoveComponent implements MouseInputListener {
 		BufferedWriter output = new BufferedWriter(new FileWriter("output.csv"));
 		SpriteLibrary sprites = new SpriteLibrary();
 		final PSMoveClient client = new PSMoveClient();
-		// try {
-		// client.connect("130.195.11.193", 7899);
-		// client.delayChange(2);
-		// } catch (IOException e) {
-		// System.err.println("Connection to PSMove server failed");
-		// }
+		try {
+			client.connect("130.195.11.193", 7899);
+			client.delayChange(2);
+		} catch (IOException e) {
+			System.err.println("Connection to PSMove server failed");
+		}
 
 		Changer c = new Changer(frame, client,output);
 
