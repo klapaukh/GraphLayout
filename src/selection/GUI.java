@@ -521,7 +521,7 @@ public class GUI extends MoveComponent implements MouseInputListener {
 				if ((buttonsPushed & UpdateListener.ButtonStart) != 0) {
 					moveClient.calibrateController(0);
 				}
-				if (trigger > 0) {
+				if (trigger > 60) {
 					// Trigger is down - like mouse button
 					if (triggerLast == 0 && deselecting && !selectedThisRound.isEmpty()) {
 						selectedThisRound.get(selectedThisRound.size() - 1).toggleSelected();
@@ -538,7 +538,7 @@ public class GUI extends MoveComponent implements MouseInputListener {
 					}
 
 				}
-				if (selecting && (trigger < 100) || (deselecting && (buttonsReleased & UpdateListener.ButtonMove) != 0)) {
+				if (selecting && (trigger < 10) || (deselecting && (buttonsReleased & UpdateListener.ButtonMove) != 0)) {
 					for (Node n : nodes) {
 						boolean thisRound = selectedThisRound.contains(n);
 						if (!thisRound && deselecting == n.selected() && n.inside(points, size)) {
@@ -635,9 +635,6 @@ public class GUI extends MoveComponent implements MouseInputListener {
 			gui.loadGraph(args[0]);
 			guis.add(gui);
 		} else {
-			boolean forces = Math.random() < 0.5;
-			output.write(forces ? "L" : "LWED" + "\n");
-			output.flush();
 			System.out.println("Loading all guis");
 			Scanner scan = new Scanner(new File(args[0]));
 			List<String> files = new ArrayList<String>();
