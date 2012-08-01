@@ -1,3 +1,4 @@
+results/
 bin/
 examples/
 tests/
@@ -14,7 +15,6 @@ randtest/
 north/
 rome/
 random-dag/
-*.R
 *.csv
 north
 rome
