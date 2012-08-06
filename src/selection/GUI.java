@@ -226,6 +226,10 @@ public class GUI extends MoveComponent implements MouseInputListener {
 		g.fillOval(mouseX - 10, mouseY - 10, 20, 20);
 		g.setColor(Color.BLACK);
 		g.drawOval(mouseX - 10, mouseY - 10, 20, 20);
+		
+		if(moveLost){
+			g.drawImage(moveNotThere, 10, 10, null);
+		}
 	}
 
 	@Override
