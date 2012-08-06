@@ -33,9 +33,11 @@ public abstract class MoveComponent extends JComponent implements UpdateListener
 	
 	public void moveLost(){
 		this.moveLost = true;
+		this.repaint();
 	}
 	
 	public void moveRegained(){
 		this.moveLost = false;
+		this.repaint();
 	}
 }

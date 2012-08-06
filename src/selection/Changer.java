@@ -24,6 +24,7 @@ public class Changer {
 			frame.getContentPane().removeAll();
 			GUI.count++;
 			client.registerListener(GUI.guis.get(GUI.count));
+			client.setMoveLostListener(GUI.guis.get(GUI.count));
 			frame.getContentPane().add(GUI.guis.get(GUI.count),
 					BorderLayout.CENTER);
 

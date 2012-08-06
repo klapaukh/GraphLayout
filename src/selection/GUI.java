@@ -674,6 +674,7 @@ public class GUI extends MoveComponent implements MouseInputListener {
 			guis.add(new FinalScreen());
 		}
 		client.registerListener(guis.get(0));
+		client.setMoveLostListener(guis.get(0));
 		frame.getContentPane().add(guis.get(0), BorderLayout.CENTER);
 
 		KeyListener list = new KeyListener() {
@@ -686,6 +687,7 @@ public class GUI extends MoveComponent implements MouseInputListener {
 						frame.getContentPane().removeAll();
 						frame.getContentPane().add(guis.get(++count), BorderLayout.CENTER);
 						client.registerListener(guis.get(count));
+						client.setMoveLostListener(guis.get(count));
 						frame.validate();
 						frame.repaint();
 					}
@@ -696,6 +698,7 @@ public class GUI extends MoveComponent implements MouseInputListener {
 						frame.getContentPane().removeAll();
 						frame.getContentPane().add(guis.get(--count), BorderLayout.CENTER);
 						client.registerListener(guis.get(count));
+						client.setMoveLostListener(guis.get(count));
 						frame.validate();
 						frame.repaint();
 					}
