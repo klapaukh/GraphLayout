@@ -96,6 +96,12 @@ public class QuestionPane extends MoveComponent implements MouseListener {
 
 		g.setColor(Color.GREEN);
 		g.fillOval(mouseX - 10, mouseY - 10, 20, 20);
+		g.setColor(Color.BLACK);
+		g.drawOval(mouseX - 10, mouseY - 10, 20, 20);
+		
+		if(moveLost){
+			g.drawImage(moveNotThere, 10, 10, null);
+		}
 	}
 
 	private void select(int x, int y) {
