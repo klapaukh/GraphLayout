@@ -224,6 +224,8 @@ public class GUI extends MoveComponent implements MouseInputListener {
 
 		g.setColor(Color.GREEN);
 		g.fillOval(mouseX - 10, mouseY - 10, 20, 20);
+		g.setColor(Color.BLACK);
+		g.drawOval(mouseX - 10, mouseY - 10, 20, 20);
 	}
 
 	@Override
@@ -630,7 +632,7 @@ public class GUI extends MoveComponent implements MouseInputListener {
 
 		Changer c = new Changer(frame, client,output);
 
-		if (args[0].endsWith("dot")) {
+		if (args[0].endsWith("dot") || args[0].endsWith("rend")) {
 			GUI gui = new GUI(sprites, client, output, c);
 			gui.loadGraph(args[0]);
 			guis.add(gui);
