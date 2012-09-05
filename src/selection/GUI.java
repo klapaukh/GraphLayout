@@ -498,7 +498,7 @@ public class GUI extends MoveComponent implements MouseInputListener {
 				if ((buttonsPushed & UpdateListener.ButtonMove) != 0) {
 					// right click from before
 					if (selecting && !selectedThisRound.isEmpty()) {
-						selectedThisRound.get(selectedThisRound.size() - 1).toggleSelected();
+//						selectedThisRound.get(selectedThisRound.size() - 1).toggleSelected();
 					} else if (!selecting) {
 						deselecting = true;
 						ensureCapacity();
