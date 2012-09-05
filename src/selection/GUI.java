@@ -463,30 +463,30 @@ public class GUI extends MoveComponent implements MouseInputListener {
 
 			try {
 				if ((buttonsPushed & UpdateListener.ButtonCircle) != 0) {
-					if (selecting) {
-						out.write("Selection cancelled\n");
-						// cancel current selection
-						for (Node n : selectedThisRound) {
-							n.setSelected(false);
-							size = 0;
-						}
-						selecting = false;
-					} else {
-						out.write("Deselect all\n");
-						// Deselect all
-						for (Node n : nodes) {
-							n.setSelected(false);
-						}
-					}
+//					if (selecting) {
+//						out.write("Selection cancelled\n");
+//						// cancel current selection
+//						for (Node n : selectedThisRound) {
+//							n.setSelected(false);
+//							size = 0;
+//						}
+//						selecting = false;
+//					} else {
+//						out.write("Deselect all\n");
+//						// Deselect all
+//						for (Node n : nodes) {
+//							n.setSelected(false);
+//						}
+//					}
 				}
 				if ((buttonsPushed & UpdateListener.ButtonCross) != 0) {
-					if (!selecting) {
-						// select all
-						out.write("Select all\n");
-						for (Node n : nodes) {
-							n.setSelected(true);
-						}
-					}
+//					if (!selecting) {
+//						// select all
+//						out.write("Select all\n");
+//						for (Node n : nodes) {
+//							n.setSelected(true);
+//						}
+//					}
 				}
 				if ((buttonsPushed & UpdateListener.ButtonTriangle) != 0) {
 					moveClient.setTrackingColor(PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME, PSMoveClient.PICK_FOR_ME,
