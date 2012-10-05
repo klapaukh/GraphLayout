@@ -530,7 +530,7 @@ public class GUI extends MoveComponent implements MouseInputListener {
 				if (trigger > 60) {
 					// Trigger is down - like mouse button
 					if (triggerLast == 0 && deselecting && !selectedThisRound.isEmpty()) {
-						selectedThisRound.get(selectedThisRound.size() - 1).toggleSelected();
+//						selectedThisRound.get(selectedThisRound.size() - 1).toggleSelected();
 					} else if (!deselecting) {
 						selecting = true;
 						ensureCapacity();
@@ -624,6 +624,10 @@ public class GUI extends MoveComponent implements MouseInputListener {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new BorderLayout());
 
+		if((new File("output.csv")).exists()){
+			System.out.println("Output file already exists!!!!");
+			System.exit(10);
+		}
 		BufferedWriter output = new BufferedWriter(new FileWriter("output.csv"));
 		SpriteLibrary sprites = new SpriteLibrary();
 		final PSMoveClient client = new PSMoveClient();
@@ -715,8 +719,17 @@ public class GUI extends MoveComponent implements MouseInputListener {
 			}
 		};
 		frame.addKeyListener(list);
+		
+		Runtime.getRuntime().addShutdownHook(new Thread(){public void run(){try {
+			client.disableLaser(0);
+			client.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}}});
+		
 		frame.setVisible(true);
-
+		
+		
 	}
 
 }
