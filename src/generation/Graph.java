@@ -43,7 +43,6 @@ import representation.Arc;
 import representation.Node;
 import representation.SpriteLibrary;
 import representation.Vector;
-import representation.VectorFactory;
 
 public class Graph {
 
@@ -505,8 +504,8 @@ public class Graph {
 			e.printStackTrace();
 		}
 		double total_kinetic_energy = 0; // running sum of total kinetic energy over all particles
-		Vector solution = VectorFactory.newVector(0, 0);
-		Vector solution2 = VectorFactory.newVector(0, 0);
+		Vector solution = new Vector(0, 0);
+		Vector solution2 = new Vector(0, 0);
 
 		for (Node n : nodes) {
 			n.resetForces();
@@ -784,9 +783,6 @@ public class Graph {
 		for (Node n : nodes) {
 			total_kinetic_energy = total_kinetic_energy + n.kineticEnergy();
 		}
-
-		VectorFactory.delete(solution);
-		VectorFactory.delete(solution2);
 
 		lock.release();
 		return Double.isNaN(total_kinetic_energy) ? Double.MAX_VALUE : total_kinetic_energy;

@@ -212,14 +212,14 @@ public class Node {
 	}
 
 	public void collided(Node n, double coefficientOfRestitution) {
-		Vector v1 = VectorFactory.newVector(dx, dy);
+		Vector v1 = new Vector(dx, dy);
 		// System.out.print(name + " " + v1 + " to ");
-		Vector v2 = VectorFactory.newVector(n.dx, n.dy);
-		Vector a = VectorFactory.newVector(n.x + n.width / 2 - x - width / 2, n.y + n.height / 2 - y - height / 2);
+		Vector v2 = new Vector(n.dx, n.dy);
+		Vector a = new Vector(n.x + n.width / 2 - x - width / 2, n.y + n.height / 2 - y - height / 2);
 		a.multiply(-1);
-		Vector projv1 = VectorFactory.newVector(a).multiply(v1.dot(a) / Math.pow(a.length(), 2));
+		Vector projv1 = new Vector(a).multiply(v1.dot(a) / Math.pow(a.length(), 2));
 		Vector orthv1 = v1.minus(projv1);
-		Vector projv2 = VectorFactory.newVector(a).multiply(v2.dot(a) / Math.pow(a.length(), 2));
+		Vector projv2 = new Vector(a).multiply(v2.dot(a) / Math.pow(a.length(), 2));
 
 		Vector collision = projv1.multiply(this.mass - n.mass * coefficientOfRestitution)
 				.add(projv2.multiply(n.mass * (1 + coefficientOfRestitution))).multiply(1.0 / (this.mass + n.mass));
@@ -227,12 +227,6 @@ public class Node {
 		dx = speed.x;
 		dy = speed.y;
 
-		VectorFactory.delete(v1);
-		VectorFactory.delete(v2);
-		VectorFactory.delete(a);
-		VectorFactory.delete(projv1);
-		VectorFactory.delete(projv2);
-		// System.out.println(speed);
 	}
 
 	public void setPosition(double newx, double newy) {
