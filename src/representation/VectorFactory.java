@@ -1,72 +1,41 @@
+/*
+ * Force Direct Graph Layout Tool
+ *
+ * Copyright (C) 2013  Roman Klapaukh
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 package representation;
 
-
-import java.util.ArrayList;
-import java.util.List;
-
 public class VectorFactory {
-	private static List<Vector> allocated = new ArrayList<Vector>();
-	private static int count = 0;
 
 	private VectorFactory() {
 
 	}
 
 	public static void delete(Vector v) {
-		synchronized (allocated) {
-			if (!v.alive || allocated.contains(v)) {
-				new RuntimeException("Deleting Dead Vector").printStackTrace();
-				System.exit(-1);
-			}
-			v.alive = false;
-			allocated.add(v);
-		}
+
 	}
 
 	public static Vector newVector(Vector v) {
 		return newVector(v.x, v.y);
-		// Vector s;
-		// if (allocated.isEmpty()) {
-		// count++;
-		// s = new Vector(v);
-		// s.alive=true;
-		// } else {
-		// s = allocated.remove(0);
-		// if(s.alive){
-		// throw new RuntimeException("Non dead object in Factory");
-		// }
-		// s.alive=true;
-		// s.set(v);
-		// }
-		// return s;
 	}
 
-	public static synchronized Vector newVector(double x, double y) {
-		synchronized (allocated) {
-			Vector s;
-			if (allocated.isEmpty()) {
-				count++;
-				s = new Vector(x, y);
-				s.alive = true;
-			} else {
-				s = allocated.remove(0);
-				if (s == null) {
-					System.err.println("NULL THING");
-				}
-				if (s.alive) {
-					new RuntimeException("Non dead object in Factory").printStackTrace();
-					System.exit(-1);
-				}
-				s.alive = true;
-				s.set(x, y);
-			}
-
-			return s;
-		}
-	}
-
-	public static int getCount() {
-		return count;
+	public static Vector newVector(double x, double y) {
+				return new Vector(x, y);
 	}
 
 }

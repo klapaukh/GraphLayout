@@ -1,3 +1,23 @@
+/*
+ * Force Direct Graph Layout Tool
+ *
+ * Copyright (C) 2013  Roman Klapaukh
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 package generation;
 
 import java.awt.Dimension;
@@ -152,7 +172,7 @@ public class Graph {
 		}
 		return dist;
 	}
-	
+
 	public double getMeanEdgeLength() {
 		double dist = 0;
 		for (Arc a : edges) {
@@ -160,8 +180,8 @@ public class Graph {
 		}
 		return dist/edges.size();
 	}
-	
-	
+
+
 	public double getVarianceEdgeLength() {
 		double mean = 0;
 		double ex2 = 0;
@@ -171,7 +191,7 @@ public class Graph {
 		}
 		mean /= edges.size();
 		ex2 /= edges.size();
-		
+
 		return ex2-(mean*mean);
 	}
 
@@ -344,7 +364,7 @@ public class Graph {
 
 	/**
 	 * Get a node at this x,y coordinate
-	 * 
+	 *
 	 * @param x
 	 *            The x coordinate to check for nodes at
 	 * @param y
@@ -519,15 +539,15 @@ public class Graph {
 					}
 				}
 			}
-			
+
 			//Label v Label
 			for(int i =0 ; i < edges.size(); i++){
 				for( int j = i+1; j < edges.size();j++){  //Repel ALL other labels
 					Arc a1 = edges.get(i);
 					Arc a2 = edges.get(j);
-					
-					coulombRepulsion(a1.label, a2.label, solution); 
-					
+
+					coulombRepulsion(a1.label, a2.label, solution);
+
 					a1.left.addForce(solution);
 					a2.right.addForce(solution);
 					solution.multiply(-1);
@@ -537,7 +557,7 @@ public class Graph {
 			}
 		}
 
-		
+
 		// Repulisive labels
 		if ((forceMode & CHARGED_EDGE_CENTERS) != 0) {
 			//Node v label
@@ -552,15 +572,15 @@ public class Graph {
 					}
 				}
 			}
-			
+
 			//Label v Label
 			for(int i =0 ; i < edges.size(); i++){
 				for( int j = i+1; j < edges.size();j++){  //Repel ALL other labels
 					Arc a1 = edges.get(i);
 					Arc a2 = edges.get(j);
-					
+
 					coulombRepulsion(a1.edgeCenter, a2.edgeCenter, solution);
-					
+
 					a1.left.addForce(solution);
 					a2.right.addForce(solution);
 					solution.multiply(-1);
@@ -568,7 +588,7 @@ public class Graph {
 					a2.right.addForce(solution);
 				}
 			}
-		} 
+		}
 		// Hookes Law
 		if ((forceMode & HOOKES_LAW) != 0 || (forceMode & HOOKES_LOG_LAW) != 0) {
 			for (Node n : nodes) {
@@ -736,11 +756,11 @@ public class Graph {
 						n1.collided(a1.right, coefficientOfRestitution);
 						a1.left.collided(n1, coefficientOfRestitution);
 						a1.right.collided(n1, coefficientOfRestitution);
-						
+
 					}
 				}// next node
 			}
-			
+
 			for (int i = 0; i < edges.size(); i++) {
 				for (int j = i + 1; j < edges.size(); j++) {
 					Arc a1 = edges.get(i);
@@ -751,7 +771,7 @@ public class Graph {
 						a1.left.collided(a2.right, coefficientOfRestitution);
 						a1.right.collided(a2.left, coefficientOfRestitution);
 						a1.right.collided(a2.right, coefficientOfRestitution);
-						
+
 						a2.left.collided(a1.left, coefficientOfRestitution);
 						a2.left.collided(a1.right, coefficientOfRestitution);
 						a2.right.collided(a1.left, coefficientOfRestitution);
@@ -1101,7 +1121,7 @@ public class Graph {
 
 	public double angleDeviation() {
 		int total = 0;
-		int count = 0; 
+		int count = 0;
 		for(int i= 0; i < edges.size(); i++){
 			for(int j=i+1;j<edges.size(); j++){
 				Arc a1 =edges.get(i);
@@ -1121,32 +1141,32 @@ public class Graph {
 					n1 = a2.left;
 					n2 = a1.other(a2.right);
 				}
-				
+
 				if(corner == null){
 					continue;
 				}
-				
+
 				double cx = corner.x() + corner.width()/2;
 				double cy = corner.y() + corner.height()/2;
-				
+
 				double n1x = n1.x() + n1.width()/2;
 				double n1y = n1.y() + n1.height()/2;
-				
+
 				double n2x = n2.x() + n2.width()/2;
 				double n2y = n2.y() + n2.height()/2;
-				
+
 				double B = Math.sqrt(Math.pow(cx-n1x,2) + Math.pow(cy-n1y,2));
 				double C = Math.sqrt(Math.pow(cx-n2x,2) + Math.pow(cy-n2y,2));
 				double A = Math.sqrt(Math.pow(n1x-n2x,2) + Math.pow(n1y-n2y,2));
-				
+
 				double cosa = ((C*C)+(B*B) - (A*A))/(2*B*C);
 				double a = Math.acos(cosa);
-				
+
 				double error = a- (360.0/corner.degree());
-				
+
 				total += error * error;
 				count++;
-				
+
 			}
 		}
 		if(count != 0){

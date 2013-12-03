@@ -1,3 +1,23 @@
+/*
+ * Force Direct Graph Layout Tool
+ *
+ * Copyright (C) 2013  Roman Klapaukh
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 package generation;
 
 import java.awt.Color;
@@ -162,9 +182,9 @@ public class ForceDirectedLayout extends JPanel implements MouseListener, MouseM
 
 	/**
 	 * A undirected general graph
-	 * 
+	 *
 	 * @author roma
-	 * 
+	 *
 	 */
 
 	public static String randString(int x, Random r) {
@@ -385,7 +405,7 @@ public class ForceDirectedLayout extends JPanel implements MouseListener, MouseM
 		}
 		if ((mode & Graph.CHARGED_LABELS) != 0) {
 			System.out.println("Charged Labels");
-		}		
+		}
 		if ((mode & Graph.CHARGED_EDGE_CENTERS) != 0) {
 			System.out.println("Charged Edge Centres");
 		}
@@ -519,15 +539,15 @@ public class ForceDirectedLayout extends JPanel implements MouseListener, MouseM
 				System.err.println("\nRepulsive Forces:");
 				System.err.println("0: Coulomb's Law Only");
 				System.err.println("1: Charged Labels");
-				System.err.println("2: Charged Label Centres");		
-				
+				System.err.println("2: Charged Label Centres");
+
 				System.err.println("\nExtra Forces:");
 				System.err.println("1: Charged Walls");
 				System.err.println("2: Collisions");
 				System.err.println("4: Degree Based Charge");
 				System.err.println("8: Wrap Around Charges");
 
-				
+
 				System.exit(-1);
 			}
 
@@ -551,7 +571,7 @@ public class ForceDirectedLayout extends JPanel implements MouseListener, MouseM
 			} else if (baseforces == 1) {
 				forceMode |= Graph.HOOKES_LOG_LAW;
 			}
-			
+
 			//Repulsion
 			forceMode |= Graph.COULOMBS_LAW;
 			if (respulsiveforces == 1) {
@@ -559,7 +579,7 @@ public class ForceDirectedLayout extends JPanel implements MouseListener, MouseM
 			} else if (respulsiveforces == 2) {
 				forceMode |= Graph.CHARGED_EDGE_CENTERS;
 			}
-			
+
 			//Extra forces
 			if ((extraforces & 0x1) != 0) {
 				forceMode |= Graph.CHARGED_WALLS;
@@ -678,7 +698,7 @@ public class ForceDirectedLayout extends JPanel implements MouseListener, MouseM
 			long time = end - start;
 			headings.add("time");
 			values.add("" + time);
-			
+
 			headings.add("Time Limit");
 			values.add("" + maxMillis);
 
@@ -696,7 +716,7 @@ public class ForceDirectedLayout extends JPanel implements MouseListener, MouseM
 
 			headings.add("Layout Height");
 			values.add(String.format("%.3f", g.layoutHeight()));
-			
+
 			headings.add("Average Deviation From Ideal Arc Seperation");
 			values.add(String.format("%.3f", g.angleDeviation()));
 

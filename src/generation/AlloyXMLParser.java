@@ -1,3 +1,23 @@
+/*
+ * Force Direct Graph Layout Tool
+ *
+ * Copyright (C) 2013  Roman Klapaukh
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 package generation;
 
 import java.util.ArrayList;
@@ -13,19 +33,19 @@ public class AlloyXMLParser extends DefaultHandler {
 
 	List<Atom> objects;
 	Map<String, List<Relation>> relations; // Map name -> neighbors
-	
+
 	String field;
 	String sig;
 	String first;
-	
+
 	public AlloyXMLParser(){
 		objects = new ArrayList<Atom>();
-		relations = new TreeMap<String, List<Relation>>(); 
-		
+		relations = new TreeMap<String, List<Relation>>();
+
 		first = sig = field = null;
-				
+
 	}
-	
+
 	public void startDocument() {
 		//Do nothing
 	}
@@ -40,7 +60,7 @@ public class AlloyXMLParser extends DefaultHandler {
 		String eName = sName; // element name
 		if ("".equals(eName))
 			eName = qName; // not namespace-aware
-		
+
 		if(eName.equalsIgnoreCase("sig")){
 			//open sig scope
 			sig = attrs.getValue("label");
@@ -95,7 +115,7 @@ public class AlloyXMLParser extends DefaultHandler {
 			first = null;
 		}
 	}
-	
+
 	public void characters(char buf[], int offset, int len)
 	{
 	  String s = new String(buf, offset, len);
@@ -104,16 +124,16 @@ public class AlloyXMLParser extends DefaultHandler {
 	  } else {
 	    textBuffer.append(s);
 	  }
-	} 
+	}
 
-	
+
 	public List<Atom> getObjects(){
 		return objects;
 	}
-	
+
 	public Map<String, List<Relation>> getRelations(){
 		return relations;
 	}
-	
+
 
 }
